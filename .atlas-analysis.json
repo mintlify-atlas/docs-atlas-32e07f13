@@ -1,0 +1,128 @@
+{
+  "projectType": "cli-tool",
+  "projectName": "Dzaleka Digital Heritage CLI",
+  "projectDescription": "A command-line tool for interacting with the Dzaleka Refugee Camp's digital heritage platform API.",
+  "theme": "aspen",
+  "primaryColor": "#0891b2",
+  "lightColor": "#06b6d4",
+  "darkColor": "#0e7490",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart",
+              "configuration"
+            ]
+          },
+          {
+            "group": "Core Features",
+            "pages": [
+              "features/services",
+              "features/events",
+              "features/photos",
+              "features/population",
+              "features/resources"
+            ]
+          },
+          {
+            "group": "Advanced Usage",
+            "pages": [
+              "advanced/search",
+              "advanced/batch-operations",
+              "advanced/export",
+              "advanced/interactive-shell"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Command Reference",
+        "groups": [
+          {
+            "group": "Configuration",
+            "pages": [
+              "commands/config",
+              "commands/health"
+            ]
+          },
+          {
+            "group": "Content Management",
+            "pages": [
+              "commands/services",
+              "commands/events",
+              "commands/photos",
+              "commands/population",
+              "commands/resources"
+            ]
+          },
+          {
+            "group": "Utilities",
+            "pages": [
+              "commands/search",
+              "commands/batch",
+              "commands/export",
+              "commands/stats",
+              "commands/shell"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Development",
+        "groups": [
+          {
+            "group": "Contributing",
+            "pages": [
+              "development/contributing",
+              "development/testing",
+              "development/troubleshooting"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Browse and manage services, events, and photos from Dzaleka Refugee Camp",
+    "Access population statistics and demographic data",
+    "Search across all content types with filtering",
+    "Batch upload and download operations",
+    "Export data to CSV and markdown reports",
+    "Interactive shell with command history and tab completion",
+    "Rich terminal output with colorized tables and progress bars",
+    "Configurable API endpoint and timeout settings"
+  ],
+  "publicApiSurface": [
+    "dzdk config",
+    "dzdk health",
+    "dzdk services list",
+    "dzdk services get",
+    "dzdk events list",
+    "dzdk events get",
+    "dzdk photos list",
+    "dzdk photos upload",
+    "dzdk photos edit",
+    "dzdk photos metadata",
+    "dzdk photos album create",
+    "dzdk photos album add",
+    "dzdk photos album list",
+    "dzdk population stats",
+    "dzdk resources list",
+    "dzdk resources get",
+    "dzdk resources fetch",
+    "dzdk search",
+    "dzdk batch download",
+    "dzdk batch upload",
+    "dzdk export csv",
+    "dzdk export report",
+    "dzdk stats services",
+    "dzdk stats usage",
+    "dzdk shell"
+  ]
+}
