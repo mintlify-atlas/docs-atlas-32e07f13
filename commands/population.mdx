@@ -1,0 +1,143 @@
+---
+title: 'dzdk population'
+description: 'Access Dzaleka population statistics and demographics data'
+---
+
+## Overview
+
+The `dzdk population` command group provides access to population statistics and demographic data for Dzaleka Refugee Camp. View comprehensive statistics including total population, demographics distribution, nationality breakdowns, and historical population trends.
+
+## Commands
+
+### dzdk population stats
+
+Get current population statistics with visual representations.
+
+```bash
+dzdk population stats
+```
+
+#### Examples
+
+```bash
+# Get population statistics
+dzdk population stats
+```
+
+#### Output Format
+
+The command displays multiple sections with statistical data:
+
+**Population Overview**
+- Total population count (with comma formatting)
+- Number of new arrivals
+
+**Demographics Distribution**
+
+Displays a table showing demographic categories with:
+- Category name (e.g., children, adults, elderly)
+- Percentage of total population
+- Visual bar chart representation
+
+Each █ character in the visual represents approximately 2% of the population.
+
+**Nationalities Distribution**
+
+Displays a table showing nationality breakdown with:
+- Country name
+- Percentage of total population
+- Visual bar chart representation
+
+Each █ character represents approximately 2% of the population.
+
+**Population Trends Over Time**
+
+Displays historical population data with:
+- Year
+- Population count (with comma formatting)
+- Visual trend representation scaled relative to maximum value
+
+**Visualization Legend**
+
+Provides explanation of the visual representations:
+- Bar charts use █ characters
+- Scale information for each visualization type
+- Relative scaling explanation for trends
+
+#### Example Output Structure
+
+```
+┌─────────────────────────────────┐
+│     Population Overview         │
+│                                 │
+│ Total Population: 50,000        │
+│ New Arrivals: 1,200             │
+└─────────────────────────────────┘
+
+┌──────────────────────────────────────┐
+│   Demographics Distribution          │
+├───────────┬────────────┬─────────────┤
+│ Category  │ Percentage │ Visual      │
+├───────────┼────────────┼─────────────┤
+│ Children  │ 40%        │ ████████████│
+│ Adults    │ 50%        │ ████████████│
+│ Elderly   │ 10%        │ █████       │
+└───────────┴────────────┴─────────────┘
+
+┌──────────────────────────────────────┐
+│   Nationalities Distribution         │
+├───────────┬────────────┬─────────────┤
+│ Country   │ Percentage │ Visual      │
+├───────────┼────────────┼─────────────┤
+│ Burundi   │ 60%        │ ████████████│
+│ DRC       │ 30%        │ ███████████ │
+│ Rwanda    │ 10%        │ █████       │
+└───────────┴────────────┴─────────────┘
+
+┌──────────────────────────────────────┐
+│   Population Trends Over Time        │
+├──────┬────────────┬──────────────────┤
+│ Year │ Population │ Trend            │
+├──────┼────────────┼──────────────────┤
+│ 2020 │ 40,000     │ ████████████████ │
+│ 2021 │ 42,000     │ ████████████████ │
+│ 2022 │ 45,000     │ ████████████████ │
+│ 2023 │ 48,000     │ ████████████████ │
+│ 2024 │ 50,000     │ ████████████████ │
+└──────┴────────────┴──────────────────┘
+```
+
+## Data Visualization
+
+The population stats command uses visual bar charts for easy data comprehension:
+
+- **Demographics & Nationalities**: Each █ represents ~2% of the population
+- **Trends**: Bars are scaled relative to the maximum value in the dataset
+- All numbers use comma formatting for readability (e.g., 50,000)
+
+## Use Cases
+
+### Research and Reporting
+```bash
+# Get comprehensive population statistics for reports
+dzdk population stats
+```
+
+### Demographic Analysis
+View the demographics distribution section to understand age group breakdowns.
+
+### Trend Analysis
+Use the population trends data to analyze growth patterns over time.
+
+### Nationality Distribution
+Understand the composition of the refugee camp by country of origin.
+
+## Notes
+
+- All population numbers are formatted with commas for readability
+- Visual bars provide quick at-a-glance understanding of distributions
+- Data includes historical trends for longitudinal analysis
+- Demographics typically include age-based categories
+- Nationality data shows country of origin breakdowns
+- The command automatically scales visualizations for optimal display
+- Legend explains how to interpret the visual representations

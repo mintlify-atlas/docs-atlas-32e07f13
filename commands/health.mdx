@@ -1,0 +1,221 @@
+---
+title: dzdk health
+description: Check API health status for all Dzaleka Digital Heritage endpoints
+---
+
+## Command Syntax
+
+```bash
+dzdk health
+```
+
+Check the health status of all Dzaleka Digital Heritage API endpoints. This command tests connectivity, measures response times, and reports the status of each endpoint.
+
+## Options
+
+This command takes no options.
+
+## What It Checks
+
+The health command monitors these API endpoints:
+
+- **services** - `/services`
+- **events** - `/events`
+- **photos** - `/photos`
+- **population** - `/population`
+- **resources** - `/resources`
+
+For each endpoint, the command:
+1. Sends an HTTP GET request
+2. Measures response time
+3. Checks HTTP status code (200-299 = healthy)
+4. Reports connection errors if any
+
+## Output Format
+
+The command displays results in a formatted table:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        API Health Check                             │
+│                    Monitoring all endpoints                         │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌────────────┬────────┬───────────────┬────────────────────────────┐
+│ Endpoint   │ Status │ Response Time │ Details                    │
+├────────────┼────────┼───────────────┼────────────────────────────┤
+│ services   │   ✓    │        0.12s  │ OK                         │
+│ events     │   ✓    │        0.09s  │ OK                         │
+│ photos     │   ✓    │        0.15s  │ OK                         │
+│ population │   ✓    │        0.11s  │ OK                         │
+│ resources  │   ✓    │        0.13s  │ OK                         │
+└────────────┴────────┴───────────────┴────────────────────────────┘
+
+✓ All endpoints are healthy
+```
+
+## Usage Examples
+
+### Check API Health
+
+```bash
+dzdk health
+```
+
+**Successful Output:**
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        API Health Check                             │
+│                    Monitoring all endpoints                         │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌────────────┬────────┬───────────────┬────────────────────────────┐
+│ Endpoint   │ Status │ Response Time │ Details                    │
+├────────────┼────────┼───────────────┼────────────────────────────┤
+│ services   │   ✓    │        0.12s  │ OK                         │
+│ events     │   ✓    │        0.09s  │ OK                         │
+│ photos     │   ✓    │        0.15s  │ OK                         │
+│ population │   ✓    │        0.11s  │ OK                         │
+│ resources  │   ✓    │        0.13s  │ OK                         │
+└────────────┴────────┴───────────────┴────────────────────────────┘
+
+✓ All endpoints are healthy
+```
+
+### Connection Failure Output
+
+```bash
+dzdk health
+```
+
+**Output when API is unreachable:**
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        API Health Check                             │
+│                    Monitoring all endpoints                         │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌────────────┬────────┬───────────────┬────────────────────────────────────────┐
+│ Endpoint   │ Status │ Response Time │ Details                                │
+├────────────┼────────┼───────────────┼────────────────────────────────────────┤
+│ services   │   ✗    │           N/A │ Connection refused - API server may    │
+│            │        │               │ not be running                         │
+│ events     │   ✗    │           N/A │ Connection refused - API server may    │
+│            │        │               │ not be running                         │
+│ photos     │   ✗    │           N/A │ Connection refused - API server may    │
+│            │        │               │ not be running                         │
+│ population │   ✗    │           N/A │ Connection refused - API server may    │
+│            │        │               │ not be running                         │
+│ resources  │   ✗    │           N/A │ Connection refused - API server may    │
+│            │        │               │ not be running                         │
+└────────────┴────────┴───────────────┴────────────────────────────────────────┘
+
+✗ Some endpoints are not responding
+
+Current Configuration:
+API URL: https://services.dzaleka.com/api
+Timeout: 30 seconds
+
+Troubleshooting Steps:
+1. Verify the API server is running
+2. Check if the API URL is correct
+3. Ensure network connectivity
+4. Try updating the configuration with: dzdk config --url <correct-url>
+```
+
+### HTTP Error Output
+
+```bash
+dzdk health
+```
+
+**Output when endpoint returns an error:**
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        API Health Check                             │
+│                    Monitoring all endpoints                         │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌────────────┬────────┬───────────────┬────────────────────────────┐
+│ Endpoint   │ Status │ Response Time │ Details                    │
+├────────────┼────────┼───────────────┼────────────────────────────┤
+│ services   │   ✓    │        0.12s  │ OK                         │
+│ events     │   ✗    │        0.23s  │ HTTP 404                   │
+│ photos     │   ✓    │        0.15s  │ OK                         │
+│ population │   ✓    │        0.11s  │ OK                         │
+│ resources  │   ✓    │        0.13s  │ OK                         │
+└────────────┴────────┴───────────────┴────────────────────────────┘
+
+✗ Some endpoints are not responding
+
+Current Configuration:
+API URL: https://services.dzaleka.com/api
+Timeout: 30 seconds
+
+Troubleshooting Steps:
+1. Verify the API server is running
+2. Check if the API URL is correct
+3. Ensure network connectivity
+4. Try updating the configuration with: dzdk config --url <correct-url>
+```
+
+## Status Indicators
+
+- **✓** (green) - Endpoint is healthy (HTTP 200-299)
+- **✗** (red) - Endpoint is unhealthy (connection error or HTTP error)
+
+## Response Time
+
+Response times are measured in seconds and displayed with 2 decimal places. This helps identify:
+- Network latency issues
+- API performance problems
+- Slow endpoints that may need optimization
+
+## Exit Codes
+
+- **0** - All endpoints are healthy
+- **1** - One or more endpoints are unhealthy or unreachable
+
+## Configuration
+
+The health check uses settings from your CLI configuration:
+
+- **API URL** - Base URL for API requests (default: `https://services.dzaleka.com/api`)
+- **Timeout** - Maximum wait time per request (default: 30 seconds)
+
+Update these settings with:
+```bash
+dzdk config --url "https://api.example.com" --timeout 60
+```
+
+## Troubleshooting
+
+### Connection Refused
+
+If you see "Connection refused" errors:
+
+1. Verify the API server is running
+2. Check if the API URL is correct using `dzdk show-config`
+3. Test network connectivity: `ping services.dzaleka.com`
+4. Update the API URL if needed: `dzdk config --url "https://correct-url.com"`
+
+### Timeout Errors
+
+If requests time out:
+
+1. Check network latency
+2. Increase timeout: `dzdk config --timeout 60`
+3. Verify API server performance
+
+### HTTP Errors
+
+If you see HTTP 404, 500, or other errors:
+
+1. Check if the endpoint exists in the API
+2. Verify API server logs for errors
+3. Ensure the API version is compatible
+
+## Related Commands
+
+- [dzdk config](/commands/config) - Update API URL and timeout settings
+- `dzdk show-config` - View current configuration (see config command page)

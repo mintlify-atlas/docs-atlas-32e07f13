@@ -1,0 +1,177 @@
+---
+title: 'dzdk events'
+description: 'Manage Dzaleka events including listing and viewing event details'
+---
+
+## Overview
+
+The `dzdk events` command group allows you to discover and explore events in Dzaleka Refugee Camp. You can list events with filtering and pagination, and view detailed information about specific events.
+
+## Commands
+
+### dzdk events list
+
+List available events with filtering, sorting, and pagination support.
+
+```bash
+dzdk events list [OPTIONS]
+```
+
+#### Options
+
+<ParamField path="--search" type="string">
+  Search term to filter events. Searches across title, description, and category fields.
+</ParamField>
+
+<ParamField path="--category" type="string">
+  Filter events by category name.
+</ParamField>
+
+<ParamField path="--status" type="string">
+  Filter by event status. Available values: `active`, `inactive`, `unknown`.
+</ParamField>
+
+<ParamField path="--sort-by" type="string" default="title">
+  Sort results by field. Available values: `title`, `category`, `status`.
+</ParamField>
+
+<ParamField path="--sort-order" type="string" default="asc">
+  Sort order for results. Available values: `asc` (ascending), `desc` (descending).
+</ParamField>
+
+<ParamField path="--page" type="integer" default="1">
+  Page number to view. Events are displayed 12 per page.
+</ParamField>
+
+#### Examples
+
+```bash
+# List all events (first page)
+dzdk events list
+
+# Search for cultural events
+dzdk events list --search cultural
+
+# Filter by workshop category
+dzdk events list --category workshop
+
+# Show only active events
+dzdk events list --status active
+
+# Sort by status in descending order
+dzdk events list --sort-by status --sort-order desc
+
+# View third page of results
+dzdk events list --page 3
+
+# Combine filters: search active workshops
+dzdk events list --search training --status active --category workshop
+```
+
+#### Output Format
+
+The command displays a table with the following columns:
+- **Title**: Event name
+- **Date**: Event date and time (YYYY-MM-DD HH:MM format)
+- **Location**: Event location/venue
+- **Status**: Event status (active, inactive, completed)
+- **Category**: Event category
+
+Pagination info shows current page, total pages, and navigation commands.
+
+---
+
+### dzdk events get
+
+Get detailed information for a specific event.
+
+```bash
+dzdk events get --id <event-id>
+```
+
+#### Options
+
+<ParamField path="--id" type="string" required>
+  Event ID or slug to retrieve. This is a required parameter.
+</ParamField>
+
+#### Examples
+
+```bash
+# Get event by ID
+dzdk events get --id event-456
+
+# Get event by slug
+dzdk events get --id community-workshop
+```
+
+#### Output Format
+
+Displays comprehensive event information including:
+
+**Event Details**
+- Title
+- Description
+- Start date and time
+- End date and time (if applicable)
+- Location/venue
+- Category
+- Organizer
+- Status
+- Tags
+
+**Contact Information**
+- Email address
+- Phone number
+- WhatsApp number (if available)
+
+**Registration Information**
+- Registration required (Yes/No)
+- Registration URL
+- Registration deadline (if applicable)
+
+## Pagination
+
+All list commands display 12 items per page. Use the `--page` flag to navigate:
+
+```bash
+# View page 1 (default)
+dzdk events list
+
+# View page 2
+dzdk events list --page 2
+
+# View page 4
+dzdk events list --page 4
+```
+
+The output includes navigation help showing commands for next/previous pages.
+
+## Filtering and Sorting
+
+You can combine multiple filters and sorting options:
+
+```bash
+# Complex filter: active workshops sorted by title
+dzdk events list --category workshop --status active --sort-by title --sort-order asc
+
+# Search with pagination
+dzdk events list --search music --page 2
+
+# Sort events by category
+dzdk events list --sort-by category --sort-order desc
+```
+
+## Date Formatting
+
+All event dates and times are displayed in the format: `YYYY-MM-DD HH:MM`
+
+Example: `2026-03-15 14:30`
+
+## Notes
+
+- Search is case-insensitive and searches across title, description, and category
+- Events can have optional end dates for multi-day events
+- Registration information is displayed when available
+- Contact information includes email, phone, and WhatsApp options
+- Tags help categorize events for easier discovery

@@ -1,0 +1,278 @@
+---
+title: Cross-Content Search
+description: Search across all resources, services, events, and photos in the Dzaleka Digital Heritage platform
+icon: magnifying-glass
+---
+
+## Overview
+
+The search functionality allows you to find content across multiple resource types simultaneously. The search command performs intelligent text matching across relevant fields and returns ranked results.
+
+### Use Cases
+
+- Find services, events, or resources by keyword
+- Discover photos by location or tags
+- Research topics across multiple content types
+- Quick content discovery and exploration
+
+### Benefits
+
+- **Cross-platform search**: Query all content types at once
+- **Field-aware matching**: Searches in relevant fields (title, description, location, tags, etc.)
+- **Ranked results**: Results sorted by relevance
+- **Progress tracking**: Visual feedback during search operation
+- **Flexible filtering**: Search specific content types or all at once
+
+## Basic Search
+
+Search across all content types:
+
+```bash
+dzdk search --query "education"
+```
+
+This searches through services, events, photos, and resources for the term "education".
+
+## Search Specific Content Types
+
+Limit your search to a specific content type:
+
+<Tabs>
+  <Tab title="Services">
+    ```bash
+    dzdk search --query "health" --type services
+    ```
+    
+    Searches only within the services database, checking:
+    - Service title
+    - Description
+    - Category
+  </Tab>
+  
+  <Tab title="Events">
+    ```bash
+    dzdk search --query "workshop" --type events
+    ```
+    
+    Searches events, checking:
+    - Event title
+    - Description
+    - Category
+    - Location
+  </Tab>
+  
+  <Tab title="Photos">
+    ```bash
+    dzdk search --query "market" --type photos
+    ```
+    
+    Searches photos, checking:
+    - Photo title
+    - Description
+    - Location
+    - Tags array
+  </Tab>
+  
+  <Tab title="Resources">
+    ```bash
+    dzdk search --query "report" --type resources
+    ```
+    
+    Searches resources, checking:
+    - Resource title
+    - Description
+    - Category
+    - Author
+  </Tab>
+</Tabs>
+
+## Controlling Result Count
+
+Limit the number of results returned:
+
+```bash
+dzdk search --query "community" --limit 5
+```
+
+<Note>
+The default limit is 10 results. Increase this for broader searches or decrease for quick lookups.
+</Note>
+
+## Command Reference
+
+### Syntax
+
+```bash
+dzdk search --query <search_term> [options]
+```
+
+### Required Options
+
+| Option | Description | Example |
+|--------|-------------|----------|
+| `--query` | Search term or phrase | `--query "education"` |
+
+### Optional Flags
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--type` | choice | `all` | Content type: `all`, `services`, `events`, `photos`, `resources` |
+| `--limit` | integer | `10` | Maximum number of results to return |
+
+## Search Implementation Details
+
+The search function operates by:
+
+1. **Determining scope**: Based on the `--type` parameter, it selects which content types to search
+2. **Fetching data**: Makes concurrent API requests to relevant endpoints
+3. **Field matching**: For each item, checks if the query appears in searchable fields
+4. **Ranking results**: Sorts by relevance (frequency of matches in title/description)
+5. **Limiting output**: Returns only the top N results based on `--limit`
+
+### Searchable Fields by Type
+
+<CodeGroup>
+```python Services
+# dzdk.py:1686-1687
+searchable_fields = {
+    'services': ['title', 'description', 'category']
+}
+```
+
+```python Events
+# dzdk.py:1688
+searchable_fields = {
+    'events': ['title', 'description', 'category', 'location']
+}
+```
+
+```python Photos
+# dzdk.py:1689
+searchable_fields = {
+    'photos': ['title', 'description', 'location', 'tags']
+}
+```
+
+```python Resources
+# dzdk.py:1690-1691
+searchable_fields = {
+    'resources': ['title', 'description', 'category', 'author']
+}
+```
+</CodeGroup>
+
+### Relevance Algorithm
+
+Results are ranked using a simple relevance score:
+
+```python
+# dzdk.py:1709-1712
+results.sort(key=lambda x: sum(
+    query.lower() in str(x['item'].get(field, '')).lower()
+    for field in ['title', 'description']
+), reverse=True)
+```
+
+Items with more matches in `title` and `description` fields rank higher.
+
+## Example Output
+
+When you run a search, results are displayed in formatted panels:
+
+```bash
+dzdk search --query "education" --type services --limit 3
+```
+
+```
+╭─────────────────── Search Results ───────────────────╮
+│              Searching for: education                │
+╰──────────────────────────────────────────────────────╯
+
+╭─────────────────── Services ─────────────────────────╮
+│ Education Support Center                             │
+│ Providing educational resources and tutoring         │
+│                                                      │
+│ Contact: [email protected]                            │
+│ Location: Zone 3, Dzaleka Camp                       │
+╰──────────────────────────────────────────────────────╯
+
+╭─────────────────── Search Summary ──────────────────╮
+│ Found 3 results across 1 categories                 │
+╰─────────────────────────────────────────────────────╯
+```
+
+## Performance Tips
+
+<Tip>
+**Optimize search performance:**
+- Use `--type` to search only the content type you need
+- Start with a lower `--limit` value and increase if needed
+- Use specific keywords rather than generic terms
+- Combine with other commands using shell pipes for filtering
+</Tip>
+
+## Best Practices
+
+### Effective Search Queries
+
+1. **Be specific**: Use precise keywords that match your target content
+   ```bash
+   dzdk search --query "mental health counseling" --type services
+   ```
+
+2. **Use content-type filters**: Narrow your search to relevant types
+   ```bash
+   dzdk search --query "2024" --type events
+   ```
+
+3. **Adjust result limits**: Find the right balance between completeness and clarity
+   ```bash
+   dzdk search --query "community" --limit 20
+   ```
+
+### Search Strategies
+
+<AccordionGroup>
+  <Accordion title="Finding services by category">
+    Search for category keywords like "health", "education", "legal", etc.:
+    ```bash
+    dzdk search --query "legal" --type services
+    ```
+  </Accordion>
+  
+  <Accordion title="Discovering location-based content">
+    Search for location names in events and photos:
+    ```bash
+    dzdk search --query "Zone 4" --type photos
+    ```
+  </Accordion>
+  
+  <Accordion title="Research by topic">
+    Search all content types for comprehensive topic coverage:
+    ```bash
+    dzdk search --query "youth" --type all --limit 20
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+Search performs case-insensitive substring matching. Very common words may return many results. Use the `--limit` flag to manage large result sets.
+</Warning>
+
+## Error Handling
+
+The search command handles errors gracefully:
+
+```python
+# dzdk.py:1703-1704
+except requests.exceptions.RequestException as e:
+    console.print(f"[yellow]Warning: Error searching {search_type}: {str(e)}[/yellow]")
+```
+
+If one content type fails to load, the search continues with other types.
+
+## Next Steps
+
+- Learn about [batch operations](/advanced/batch-operations) for bulk downloads
+- Explore [export functionality](/advanced/export) to save search results
+- Try the [interactive shell](/advanced/interactive-shell) for repeated searches

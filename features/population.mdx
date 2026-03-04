@@ -1,0 +1,292 @@
+---
+title: 'Population Statistics'
+description: 'Access demographic data and population trends'
+icon: 'users'
+---
+
+## Overview
+
+The population statistics feature provides access to demographic data, nationality distributions, and population trends for the Dzaleka Refugee Camp. This information helps understand the community composition and changes over time.
+
+<CardGroup cols={2}>
+  <Card title="Population Overview" icon="users-line">
+    View total population and new arrivals
+  </Card>
+  <Card title="Demographics" icon="chart-pie">
+    Explore demographic breakdowns with visualizations
+  </Card>
+  <Card title="Nationalities" icon="globe">
+    See nationality distribution across the camp
+  </Card>
+  <Card title="Trends" icon="chart-line">
+    Track population changes over time
+  </Card>
+</CardGroup>
+
+## Getting Population Statistics
+
+### View Statistics
+
+Retrieve current population data:
+
+```bash
+dzdk population stats
+```
+
+This command displays comprehensive population information including:
+- Total population count
+- New arrivals
+- Demographics distribution
+- Nationalities breakdown
+- Population trends over time
+
+## Understanding the Output
+
+### Population Overview
+
+The overview panel shows high-level statistics:
+
+```
+╭─────────── Population Overview ───────────╮
+│ Total Population: 52,347                  │
+│ New Arrivals: 1,234                       │
+╰───────────────────────────────────────────╯
+```
+
+<Note>
+  Numbers are formatted with commas for better readability.
+</Note>
+
+### Demographics Distribution
+
+Demographics are displayed in a visual table format:
+
+```
+┌──────────────────────────────────────────────────────┐
+│          Demographics Distribution                    │
+├───────────┬────────────┬──────────────────────────────┤
+│ Category  │ Percentage │ Visual                       │
+├───────────┼────────────┼──────────────────────────────┤
+│ Children  │ 45%        │ ██████████████████████       │
+│ Adults    │ 42%        │ █████████████████████        │
+│ Elderly   │ 13%        │ ██████                       │
+└───────────┴────────────┴──────────────────────────────┘
+```
+
+<Info>
+  Each █ represents approximately 2% in the visual representation.
+</Info>
+
+### Demographics Categories
+
+Typical demographic categories include:
+
+<AccordionGroup>
+  <Accordion title="Children">
+    Population under 18 years old, representing youth and school-age individuals in the camp.
+  </Accordion>
+  
+  <Accordion title="Adults">
+    Working-age population between 18 and 60 years old.
+  </Accordion>
+  
+  <Accordion title="Elderly">
+    Population over 60 years old, requiring specialized care and services.
+  </Accordion>
+  
+  <Accordion title="Other Categories">
+    Additional breakdowns may include gender, family composition, or other demographic factors.
+  </Accordion>
+</AccordionGroup>
+
+### Nationalities Distribution
+
+Nationality data shows the countries of origin:
+
+```
+┌──────────────────────────────────────────────────────┐
+│         Nationalities Distribution                    │
+├───────────────┬────────────┬──────────────────────────┤
+│ Country       │ Percentage │ Visual                   │
+├───────────────┼────────────┼──────────────────────────┤
+│ Congo (DRC)   │ 58%        │ █████████████████████████│
+│ Burundi       │ 28%        │ ██████████████           │
+│ Rwanda        │ 8%         │ ████                     │
+│ Other         │ 6%         │ ███                      │
+└───────────────┴────────────┴──────────────────────────┘
+```
+
+### Population Trends Over Time
+
+Historical population data visualized:
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│            Population Trends Over Time                          │
+├──────┬────────────┬──────────────────────────────────────────────┤
+│ Year │ Population │ Trend                                       │
+├──────┼────────────┼──────────────────────────────────────────────┤
+│ 2020 │ 45,234     │ ████████████████████████████                │
+│ 2021 │ 47,891     │ ██████████████████████████████              │
+│ 2022 │ 49,567     │ ███████████████████████████████             │
+│ 2023 │ 51,023     │ ████████████████████████████████            │
+│ 2024 │ 51,890     │ █████████████████████████████████           │
+│ 2025 │ 52,347     │ █████████████████████████████████           │
+└──────┴────────────┴──────────────────────────────────────────────┘
+```
+
+<Tip>
+  Trend bars are scaled relative to the maximum population value, making it easy to see growth patterns.
+</Tip>
+
+## Visualization Legend
+
+A legend panel explains the visual representations:
+
+```
+╭──────────── Visualization Legend ────────────╮
+│ Visualization Legend                         │
+│ █ - Represents percentage or population value│
+│                                              │
+│ Each █ represents approximately 2% for       │
+│ demographics and nationalities               │
+│                                              │
+│ Population trends are scaled relative to     │
+│ the maximum value                            │
+╰──────────────────────────────────────────────╯
+```
+
+## Use Cases
+
+### Analyze Demographics
+
+Understand the age distribution to plan services:
+
+```bash
+dzdk population stats
+```
+
+Look at the Demographics Distribution table to see:
+- Proportion of children (education needs)
+- Working-age adults (employment opportunities)
+- Elderly population (healthcare requirements)
+
+### Track Population Growth
+
+Monitor population changes over time:
+
+```bash
+dzdk population stats
+```
+
+Review the Population Trends table to:
+- Identify growth patterns
+- Compare year-over-year changes
+- Plan resource allocation
+
+### Understand Community Composition
+
+Analyze nationality distribution:
+
+```bash
+dzdk population stats
+```
+
+Use the Nationalities Distribution to:
+- Understand cultural diversity
+- Plan language services
+- Organize community programs
+
+## Data Interpretation
+
+<AccordionGroup>
+  <Accordion title="Total Population">
+    The total number of registered individuals in Dzaleka Refugee Camp. This includes all age groups and nationalities.
+  </Accordion>
+  
+  <Accordion title="New Arrivals">
+    Recent additions to the camp population, typically measured within the last reporting period (month or quarter).
+  </Accordion>
+  
+  <Accordion title="Percentage Values">
+    All percentages represent proportion of the total population. They should sum to 100% within each category (demographics or nationalities).
+  </Accordion>
+  
+  <Accordion title="Visual Bars">
+    The █ character is used to create visual representations. Longer bars indicate higher percentages or values.
+  </Accordion>
+  
+  <Accordion title="Trends">
+    Population trends show historical data, typically spanning multiple years to show growth or decline patterns.
+  </Accordion>
+</AccordionGroup>
+
+## Command Reference
+
+### population stats
+
+**Options:**
+No options required.
+
+**Output Sections:**
+1. Population Overview Panel
+   - Total population (formatted with commas)
+   - New arrivals count
+
+2. Demographics Distribution Table
+   - Category names
+   - Percentage values
+   - Visual bar representations
+
+3. Nationalities Distribution Table
+   - Country names
+   - Percentage values
+   - Visual bar representations
+
+4. Population Trends Over Time Table
+   - Years
+   - Population counts
+   - Scaled trend visualizations
+
+5. Visualization Legend Panel
+   - Explanation of visual elements
+   - Scale information
+
+**Display Features:**
+- Color-coded tables (cyan, green, yellow, magenta, blue)
+- Formatted numbers with thousand separators
+- Terminal-friendly visualizations
+- Clear panel borders using box-drawing characters
+
+<Info>
+  Population statistics are fetched in real-time from the Dzaleka API and reflect the most current available data.
+</Info>
+
+## Technical Notes
+
+### Visualization Scaling
+
+The CLI uses intelligent scaling for visualizations:
+
+- **Demographics & Nationalities:** Each █ represents 2% (bar_length = percentage / 2)
+- **Population Trends:** Bars are scaled relative to maximum value (scale_factor = 50 / max_value)
+
+This ensures that visualizations fit comfortably within terminal width while maintaining proportional accuracy.
+
+### Data Source
+
+All population data is retrieved from:
+```
+GET {BASE_URL}/population
+```
+
+The endpoint returns structured JSON with:
+- `total` - Total population count
+- `newArrivals` - Recent arrival count
+- `demographics` - Object with category/percentage pairs
+- `nationalities` - Object with country/percentage pairs
+- `trends` - Object with `labels` (years) and `values` (populations) arrays
+
+<Warning>
+  Population statistics represent estimates based on available registration data. Actual numbers may vary due to unregistered individuals or data collection limitations.
+</Warning>

@@ -1,0 +1,134 @@
+---
+title: Welcome to Dzaleka Digital Heritage CLI
+description: Command-line tool for interacting with the Dzaleka Refugee Camp's digital heritage platform
+mode: custom
+---
+
+<div className="relative overflow-hidden py-20 dark:bg-[#0f1117] bg-gradient-to-b from-cyan-50 to-white dark:from-[#0f1117] dark:to-[#1a1d27]">
+  <div className="max-w-7xl mx-auto px-6">
+    <div className="text-center max-w-4xl mx-auto">
+      <h1 className="text-5xl sm:text-6xl font-bold dark:text-white text-gray-900 mb-6">
+        Dzaleka Digital Heritage CLI
+      </h1>
+      <p className="text-xl dark:text-gray-300 text-gray-600 mb-8 max-w-2xl mx-auto">
+        A comprehensive command-line tool for accessing and managing digital resources from Dzaleka Refugee Camp's heritage platform
+      </p>
+      <div className="flex flex-wrap gap-4 justify-center">
+        <a
+          href="/quickstart"
+          className="inline-flex items-center px-6 py-3 rounded-lg bg-[#0891b2] text-white font-semibold hover:bg-[#0e7490] transition-colors"
+        >
+          Get started
+        </a>
+        <a
+          href="/commands/config"
+          className="inline-flex items-center px-6 py-3 rounded-lg border-2 dark:border-[#27272a] border-gray-300 dark:bg-white/5 bg-white dark:text-gray-100 text-gray-900 font-semibold dark:hover:border-[#0891b2] hover:border-[#0891b2] transition-colors"
+        >
+          Command reference
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-3xl font-semibold dark:text-white text-gray-900 mb-4">Quick start</h2>
+  <p className="dark:text-gray-400 text-gray-600 mb-8">Get up and running with DZDK CLI in minutes</p>
+
+  <Steps>
+    <Step title="Install the CLI">
+      Clone the repository and install dependencies:
+      ```bash
+      git clone https://github.com/Dzaleka-Connect/dzdk-cli.git
+      cd dzdk-cli
+      python3 -m venv venv
+      source venv/bin/activate
+      pip install -e .
+      ```
+    </Step>
+
+    <Step title="Configure the API endpoint">
+      Set your API URL and timeout preferences:
+      ```bash
+      dzdk config --url "https://services.dzaleka.com/api" --timeout 30
+      ```
+      <Info>Configuration is stored in `~/.config/dzdk/config.yaml`</Info>
+    </Step>
+
+    <Step title="Check API health">
+      Verify your connection to the API:
+      ```bash
+      dzdk health
+      ```
+      This command checks all endpoints and displays response times and status codes.
+    </Step>
+
+    <Step title="List available services">
+      Browse services in the Dzaleka camp:
+      ```bash
+      dzdk services list --page 1
+      ```
+      You'll see a formatted table with service details, categories, and contact information.
+    </Step>
+  </Steps>
+</div>
+
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-3xl font-semibold dark:text-white text-gray-900 mb-4">Explore by feature</h2>
+  <p className="dark:text-gray-400 text-gray-600 mb-8">Discover what you can do with DZDK CLI</p>
+
+  <CardGroup cols={2}>
+    <Card title="Services" icon="building" href="/features/services">
+      Browse and search services available in Dzaleka camp with filtering and pagination
+    </Card>
+    <Card title="Events" icon="calendar" href="/features/events">
+      List upcoming and past events with detailed information and registration details
+    </Card>
+    <Card title="Photos" icon="image" href="/features/photos">
+      Upload, manage, and organize photos in albums with metadata and tagging
+    </Card>
+    <Card title="Population" icon="users" href="/features/population">
+      Access demographic data, population trends, and statistical information
+    </Card>
+    <Card title="Resources" icon="book" href="/features/resources">
+      Download documents, reports, and digital resources from the library
+    </Card>
+    <Card title="Search" icon="magnifying-glass" href="/advanced/search">
+      Search across all content types with filtering and relevance sorting
+    </Card>
+  </CardGroup>
+</div>
+
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-3xl font-semibold dark:text-white text-gray-900 mb-4">Advanced capabilities</h2>
+  <p className="dark:text-gray-400 text-gray-600 mb-8">Power features for efficient workflows</p>
+
+  <CardGroup cols={3}>
+    <Card title="Batch operations" icon="layer-group" href="/advanced/batch-operations">
+      Upload or download multiple files in parallel with progress tracking
+    </Card>
+    <Card title="Data export" icon="download" href="/advanced/export">
+      Export data to CSV or generate detailed markdown reports
+    </Card>
+    <Card title="Interactive shell" icon="terminal" href="/advanced/interactive-shell">
+      Use the built-in shell with history, completion, and command suggestions
+    </Card>
+  </CardGroup>
+</div>
+
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <div className="rounded-2xl dark:bg-[#1a1d27] bg-gray-50 dark:border-[#27272a] border border-gray-200 p-8 text-center">
+    <h2 className="text-2xl font-semibold dark:text-white text-gray-900 mb-3">
+      Ready to get started?
+    </h2>
+    <p className="dark:text-gray-400 text-gray-600 mb-6 max-w-xl mx-auto">
+      Install DZDK CLI and start exploring the Dzaleka Digital Heritage platform
+    </p>
+    <a
+      href="/installation"
+      className="inline-flex items-center px-6 py-3 rounded-lg bg-[#0891b2] text-white font-semibold hover:bg-[#0e7490] transition-colors"
+    >
+      Install now
+    </a>
+  </div>
+</div>

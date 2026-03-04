@@ -1,80 +1,449 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quick start
+description: Get up and running with DZDK CLI in minutes
 ---
 
-## Get started in three steps
+## First steps
 
-Get your documentation site running locally and make your first customization.
+After [installing DZDK](/installation), you're ready to start exploring the Dzaleka Digital Heritage resources.
 
-### Step 1: Set up your local environment
-
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
+<Steps>
+  <Step title="Check API health">
+    Verify that DZDK can connect to the API:
     
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
+    ```bash
+    dzdk health
+    ```
     
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+    This command checks all API endpoints and displays their status, response times, and any errors.
+  </Step>
 
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
+  <Step title="View your configuration">
+    See your current DZDK settings:
     
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    ```bash
+    dzdk show-config
+    ```
+    
+    This displays:
+    - API URL
+    - Request timeout
+    - Configuration file location
+    - Last modified timestamp
+  </Step>
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+  <Step title="List available services">
+    Browse services in the Dzaleka camp:
+    
+    ```bash
+    dzdk services list
+    ```
+    
+    This shows the first page of services (12 per page) with details like title, category, contact information, and status.
+  </Step>
+</Steps>
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+## Common workflows
 
-### Step 3: Go live
+### Browsing services
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+List all services with pagination:
+
+```bash
+# View first page
+dzdk services list
+
+# Navigate to page 2
+dzdk services list --page 2
+```
+
+Search for specific services:
+
+```bash
+# Search by keyword
+dzdk services list --search "health"
+
+# Filter by category
+dzdk services list --category "medical"
+
+# Filter by status
+dzdk services list --status active
+```
+
+Combine filters for refined results:
+
+```bash
+dzdk services list --search "clinic" --category "medical" --status active
+```
+
+Get detailed information about a specific service:
+
+```bash
+dzdk services get --id <service_id_or_slug>
+```
+
+<Tip>
+Service details include contact information, operating hours, location, social media links, and more.
+</Tip>
+
+### Working with events
+
+List upcoming events:
+
+```bash
+dzdk events list
+```
+
+Search and filter events:
+
+```bash
+# Search for workshops
+dzdk events list --search "workshop"
+
+# Filter by category
+dzdk events list --category "education"
+
+# Sort by date (descending)
+dzdk events list --sort-by date --sort-order desc
+```
+
+View event details:
+
+```bash
+dzdk events get --id <event_id_or_slug>
+```
+
+Event details include:
+- Title and description
+- Date and time (start and end)
+- Location and organizer
+- Registration information
+- Contact details
+- Tags and categories
+
+### Managing photos
+
+List photos from the archive:
+
+```bash
+dzdk photos list
+```
+
+Upload a new photo:
+
+```bash
+dzdk photos upload --file path/to/photo.jpg --title "Market Day" --description "Weekly market at Dzaleka"
+```
+
+<CodeGroup>
+```bash Basic upload
+dzdk photos upload --file photo.jpg --title "My Photo"
+```
+
+```bash Upload with description
+dzdk photos upload \
+  --file photo.jpg \
+  --title "Community Event" \
+  --description "Annual cultural festival"
+```
+</CodeGroup>
+
+View photo metadata:
+
+```bash
+dzdk photos metadata --id <photo_id>
+```
+
+Edit photo information:
+
+```bash
+dzdk photos edit \
+  --id <photo_id> \
+  --title "New Title" \
+  --description "Updated description" \
+  --tags "community,event,culture" \
+  --location "Dzaleka Camp" \
+  --date "2024-03-20"
+```
+
+### Creating photo albums
+
+Create a new album:
+
+```bash
+dzdk photos album create \
+  --name "Cultural Events" \
+  --description "Photos from cultural celebrations" \
+  --tags "culture,events,community"
+```
+
+Add photos to an album:
+
+```bash
+dzdk photos album add \
+  --album-id <album_id> \
+  --photo-ids "photo1,photo2,photo3"
+```
+
+List all albums:
+
+```bash
+dzdk photos album list
+```
+
+### Accessing resources
+
+List available resources:
+
+```bash
+dzdk resources list
+```
+
+Search for specific resources:
+
+```bash
+# Search by keyword
+dzdk resources list --search "report"
+
+# Filter by category
+dzdk resources list --category "research"
+```
+
+Get resource details:
+
+```bash
+dzdk resources get --id <resource_id_or_slug>
+```
+
+Download a resource:
+
+```bash
+dzdk resources fetch --id <resource_id> --output report.pdf
+```
+
+## Interactive shell
+
+For a more interactive experience, use the DZDK shell:
+
+```bash
+dzdk shell
+```
+
+The shell provides:
+- Command history (persistent across sessions)
+- Tab completion for commands
+- Auto-suggestions based on history
+- Rich output formatting
+
+Example shell session:
+
+```bash
+(dzdk) services list --search "health"
+(dzdk) events list --page 2
+(dzdk) photos upload --file photo.jpg --title "My Photo"
+(dzdk) help services
+(dzdk) clear
+(dzdk) exit
+```
+
+<Note>
+Shell history is stored at `~/.config/dzdk/history` and persists across sessions.
+</Note>
+
+## Global search
+
+Search across all resource types:
+
+```bash
+# Search everything
+dzdk search --query "education"
+
+# Search only services
+dzdk search --query "health" --type services
+
+# Limit results
+dzdk search --query "event" --limit 20
+```
+
+The search command returns results from:
+- Services
+- Events
+- Photos
+- Resources
+- Population data
+
+## Batch operations
+
+Download multiple items at once:
+
+```bash
+# Download multiple resources
+dzdk batch download \
+  --type resources \
+  --ids "id1,id2,id3" \
+  --output-dir downloads
+
+# Download multiple photos
+dzdk batch download \
+  --type photos \
+  --ids "photo1,photo2,photo3" \
+  --output-dir photos
+```
+
+Upload multiple photos from a directory:
+
+```bash
+dzdk batch upload --type photos --directory ./my_photos
+```
+
+<Warning>
+Photo files must be under 10MB in size. Supported formats include JPEG, PNG, and other common image formats.
+</Warning>
+
+## Export and reporting
+
+Export data to CSV:
+
+```bash
+# Export services
+dzdk export csv --type services --output services.csv
+
+# Export population data
+dzdk export csv --type population --output population.csv
+```
+
+Generate detailed markdown reports:
+
+```bash
+# Generate services report
+dzdk export report --type services --output services_report.md
+
+# Generate population report
+dzdk export report --type population --output population_report.md
+```
+
+Reports include:
+- Comprehensive summaries
+- Detailed item information
+- Formatted tables and statistics
+- Timestamps and metadata
+
+## Pagination
+
+All list commands support pagination (12 items per page):
+
+```bash
+# View specific page
+dzdk services list --page 2
+
+# Navigate with filters
+dzdk events list --search "workshop" --page 3
+
+# Combine with sorting
+dzdk photos list --sort-by date --sort-order desc --page 1
+```
+
+After each list command, you'll see navigation help:
+
+```
+╭─────────────────────────────────────────╮
+│ Navigation Help                         │
+├─────────────────────────────────────────┤
+│ Navigation Commands:                    │
+│ • To view next page: dzdk services list --page 2
+│ • To view previous page: dzdk services list --page 1
+│ • To view specific page: dzdk services list --page <number>
+│                                         │
+│ Showing services 1-12 of 45            │
+╰─────────────────────────────────────────╯
+```
+
+## Getting help
+
+Get help for any command:
+
+```bash
+# General help
+dzdk --help
+
+# Command-specific help
+dzdk services --help
+dzdk services list --help
+dzdk photos upload --help
+```
+
+Show the welcome screen:
+
+```bash
+dzdk
+```
+
+This displays:
+- All available commands
+- Usage examples
+- Quick reference guide
+
+## Common options
+
+Most list commands support these options:
+
+- `--search <query>` - Search by keyword
+- `--category <category>` - Filter by category
+- `--status <status>` - Filter by status (active/inactive/unknown)
+- `--sort-by <field>` - Sort by field (title/category/status)
+- `--sort-order <order>` - Sort order (asc/desc)
+- `--page <number>` - Page number for pagination
+
+Example combining all options:
+
+```bash
+dzdk services list \
+  --search "medical" \
+  --category "health" \
+  --status active \
+  --sort-by title \
+  --sort-order asc \
+  --page 1
+```
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
-
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Configuration" icon="gear" href="/configuration">
+    Customize DZDK settings and behavior
+  </Card>
+  <Card title="Command Reference" icon="code" href="/commands/config">
+    Explore all available commands in detail
+  </Card>
 </CardGroup>
 
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
+## Tips and tricks
+
+<Tip>
+**Use aliases**: Create shell aliases for frequently used commands:
+
+```bash
+# Add to your ~/.bashrc or ~/.zshrc
+alias dzl="dzdk services list"
+alias dze="dzdk events list"
+alias dzp="dzdk photos list"
+```
+</Tip>
+
+<Tip>
+**Pipe output**: Combine DZDK with other command-line tools:
+
+```bash
+# Export and process with other tools
+dzdk export csv --type services --output - | grep "medical"
+```
+</Tip>
+
+<Tip>
+**Environment variables**: Override config directory location:
+
+```bash
+export DZDK_CONFIG_DIR="/path/to/custom/config"
+dzdk show-config
+```
+</Tip>

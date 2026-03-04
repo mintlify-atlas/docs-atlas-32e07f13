@@ -1,0 +1,383 @@
+---
+title: 'Photo Management'
+description: 'Upload, organize, and browse community photos'
+icon: 'camera'
+---
+
+## Overview
+
+The photo management system allows you to upload, organize, and browse photos from the Dzaleka community. Create albums, edit metadata, and explore the visual history of the community.
+
+<CardGroup cols={2}>
+  <Card title="Browse Photos" icon="images">
+    View all photos with filtering and pagination
+  </Card>
+  <Card title="Upload Photos" icon="upload">
+    Upload new photos to the archive
+  </Card>
+  <Card title="Manage Albums" icon="folder">
+    Create and organize photo albums
+  </Card>
+  <Card title="Edit Metadata" icon="pen-to-square">
+    Update photo information and tags
+  </Card>
+</CardGroup>
+
+## Browsing Photos
+
+### List All Photos
+
+Browse photos with pagination (12 per page):
+
+```bash
+dzdk photos list
+```
+
+### Filtering Options
+
+<Tabs>
+  <Tab title="Search">
+    Search across photo titles, descriptions, and categories:
+    
+    ```bash
+    dzdk photos list --search "portrait"
+    dzdk photos list --search "landscape"
+    dzdk photos list --search "2026"
+    ```
+  </Tab>
+  
+  <Tab title="Category">
+    Filter by photo category:
+    
+    ```bash
+    dzdk photos list --category "portrait"
+    dzdk photos list --category "event"
+    dzdk photos list --category "landscape"
+    ```
+  </Tab>
+  
+  <Tab title="Status">
+    Filter by photo status:
+    
+    ```bash
+    dzdk photos list --status active
+    dzdk photos list --status inactive
+    ```
+  </Tab>
+</Tabs>
+
+### Sorting and Pagination
+
+Sort photos by different criteria:
+
+```bash
+# Sort by title
+dzdk photos list --sort-by title --sort-order asc
+
+# Sort by category
+dzdk photos list --sort-by category --sort-order desc
+
+# Navigate pages
+dzdk photos list --page 2
+dzdk photos list --page 3 --category "portrait"
+```
+
+### Output Format
+
+```
+┌─────────────────────┬────────────┬────────────────┬──────────────┬─────────────────┐
+│ Title               │ Date       │ Photographer   │ Location     │ Tags            │
+├─────────────────────┼────────────┼────────────────┼──────────────┼─────────────────┤
+│ Community Portrait  │ 2026-03-04 │ John Doe       │ Zone 2       │ portrait, life  │
+│ Sunset View         │ 2026-03-03 │ Jane Smith     │ Central Area │ landscape, sun  │
+└─────────────────────┴────────────┴────────────────┴──────────────┴─────────────────┘
+```
+
+## Uploading Photos
+
+### Basic Upload
+
+Upload a photo with required title:
+
+```bash
+dzdk photos upload --file /path/to/photo.jpg --title "Community Portrait"
+```
+
+### Upload with Description
+
+Include a description with your upload:
+
+```bash
+dzdk photos upload \
+  --file /path/to/photo.jpg \
+  --title "Market Day" \
+  --description "Vibrant market scene in Zone 3"
+```
+
+### Upload Requirements
+
+<Note>
+  **File Size Limit:** 10MB maximum per photo
+  
+  **Supported Formats:** JPG, JPEG, PNG, GIF
+</Note>
+
+### Upload Output
+
+After successful upload, you'll see:
+
+```
+╭──────────── Upload Successful ────────────╮
+│ Photo uploaded successfully!              │
+│                                           │
+│ Photo Details:                            │
+│ ID: photo-12345                           │
+│ Title: Community Portrait                 │
+│ URL: https://dzaleka.org/photos/12345     │
+╰───────────────────────────────────────────╯
+```
+
+## Managing Albums
+
+### Create Album
+
+Create a new photo album:
+
+```bash
+dzdk photos album create --name "2026 Events"
+```
+
+With description and tags:
+
+```bash
+dzdk photos album create \
+  --name "2026 Events" \
+  --description "Photos from community events in 2026" \
+  --tags "events, 2026, community"
+```
+
+### List Albums
+
+View all photo albums:
+
+```bash
+dzdk photos album list
+```
+
+Output shows:
+- Album name
+- Description
+- Number of photos
+- Tags
+
+### Add Photos to Album
+
+Add one or multiple photos to an album:
+
+```bash
+# Add single photo
+dzdk photos album add --album-id album-001 --photo-ids photo-123
+
+# Add multiple photos
+dzdk photos album add \
+  --album-id album-001 \
+  --photo-ids "photo-123,photo-124,photo-125"
+```
+
+<Tip>
+  Use comma-separated photo IDs to add multiple photos at once.
+</Tip>
+
+## Editing Photo Metadata
+
+### Update Photo Information
+
+Edit various photo attributes:
+
+```bash
+# Update title
+dzdk photos edit --id photo-123 --title "New Title"
+
+# Update description
+dzdk photos edit --id photo-123 --description "Updated description"
+
+# Update location
+dzdk photos edit --id photo-123 --location "Zone 3"
+
+# Update date
+dzdk photos edit --id photo-123 --date "2026-03-04"
+
+# Update tags
+dzdk photos edit --id photo-123 --tags "portrait, community, 2026"
+```
+
+### Update Multiple Fields
+
+Combine multiple updates in one command:
+
+```bash
+dzdk photos edit \
+  --id photo-123 \
+  --title "Community Portrait" \
+  --description "A vibrant portrait of community life" \
+  --location "Zone 3 Community Center" \
+  --tags "portrait, community, life"
+```
+
+### Edit Output
+
+```
+╭──────────── Photo Updated ────────────╮
+│ Photo updated successfully!           │
+│                                       │
+│ Updated Details:                      │
+│ Title: Community Portrait             │
+│ Description: A vibrant portrait...    │
+│ Location: Zone 3 Community Center     │
+│ Date: 2026-03-04                      │
+│ Tags: portrait, community, life       │
+╰───────────────────────────────────────╯
+```
+
+## Viewing Photo Metadata
+
+### Show Detailed Metadata
+
+View comprehensive photo information:
+
+```bash
+dzdk photos metadata --id photo-123
+```
+
+### Metadata Display
+
+<AccordionGroup>
+  <Accordion title="Basic Information">
+    - Photo title
+    - Description
+    - Date taken
+    - Location
+    - Photographer name
+  </Accordion>
+  
+  <Accordion title="Technical Information">
+    - Camera model
+    - Lens type
+    - Exposure settings
+    - Aperture (f-stop)
+    - ISO value
+    - Focal length
+  </Accordion>
+  
+  <Accordion title="File Information">
+    - File format (JPG, PNG, etc.)
+    - File size
+    - Image dimensions (width x height)
+    - Resolution (DPI)
+    - Photo URL
+  </Accordion>
+</AccordionGroup>
+
+## Use Cases
+
+### Upload Event Photos
+
+```bash
+# Upload photo
+dzdk photos upload \
+  --file /photos/event.jpg \
+  --title "Cultural Festival 2026" \
+  --description "Annual cultural celebration"
+
+# Create album
+dzdk photos album create \
+  --name "Cultural Festival 2026" \
+  --tags "festival, culture, 2026"
+
+# Add to album
+dzdk photos album add --album-id album-001 --photo-ids photo-123
+```
+
+### Organize Portrait Collection
+
+```bash
+# Browse portraits
+dzdk photos list --category "portrait"
+
+# Create portrait album
+dzdk photos album create --name "Community Portraits"
+
+# Add photos to album
+dzdk photos album add --album-id album-002 --photo-ids "photo-101,photo-102"
+```
+
+### Update Photo Details
+
+```bash
+# Get current metadata
+dzdk photos metadata --id photo-123
+
+# Update information
+dzdk photos edit \
+  --id photo-123 \
+  --location "Updated Location" \
+  --tags "new, tags, here"
+```
+
+## Command Reference
+
+### photos list
+
+**Options:**
+- `--search TEXT` - Search term to filter photos
+- `--category TEXT` - Filter by category
+- `--status [active|inactive|unknown]` - Filter by status
+- `--sort-by [title|category|status]` - Sort results (default: title)
+- `--sort-order [asc|desc]` - Sort order (default: asc)
+- `--page INTEGER` - Page number (default: 1)
+
+### photos upload
+
+**Options:**
+- `--file PATH` - Path to image file (required)
+- `--title TEXT` - Photo title (required)
+- `--description TEXT` - Photo description (optional)
+
+**Limits:**
+- Maximum file size: 10MB
+
+### photos album create
+
+**Options:**
+- `--name TEXT` - Album name (required)
+- `--description TEXT` - Album description (optional)
+- `--tags TEXT` - Comma-separated tags (optional)
+
+### photos album add
+
+**Options:**
+- `--album-id TEXT` - Album ID (required)
+- `--photo-ids TEXT` - Comma-separated photo IDs (required)
+
+### photos album list
+
+No options required. Displays all albums.
+
+### photos edit
+
+**Options:**
+- `--id TEXT` - Photo ID (required)
+- `--title TEXT` - New title (optional)
+- `--description TEXT` - New description (optional)
+- `--tags TEXT` - Comma-separated tags (optional)
+- `--location TEXT` - Photo location (optional)
+- `--date TEXT` - Photo date in YYYY-MM-DD format (optional)
+
+### photos metadata
+
+**Options:**
+- `--id TEXT` - Photo ID or slug (required)
+
+<Warning>
+  Uploaded photos cannot be deleted via CLI. Contact an administrator if you need to remove a photo.
+</Warning>

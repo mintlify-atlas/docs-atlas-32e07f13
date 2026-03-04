@@ -1,0 +1,158 @@
+---
+title: dzdk search
+description: Search across all resources in the Dzaleka Digital Heritage platform
+---
+
+Search for content across services, events, photos, and resources using a unified search interface.
+
+## Syntax
+
+```bash
+dzdk search --query <search_term> [options]
+```
+
+## Options
+
+<ParamField path="--query" type="string" required>
+  Search query string to match against content
+</ParamField>
+
+<ParamField path="--type" type="choice" default="all">
+  Type of content to search
+  
+  **Choices:** `all`, `services`, `events`, `photos`, `resources`
+  
+  - `all` - Search across all content types
+  - `services` - Search only services
+  - `events` - Search only events
+  - `photos` - Search only photos
+  - `resources` - Search only resources
+</ParamField>
+
+<ParamField path="--limit" type="integer" default="10">
+  Maximum number of results to return
+</ParamField>
+
+## Search Fields
+
+The search command searches across different fields depending on the content type:
+
+### Services
+- Title
+- Description
+- Category
+
+### Events
+- Title
+- Description
+- Category
+- Location
+
+### Photos
+- Title
+- Description
+- Location
+- Tags
+
+### Resources
+- Title
+- Description
+- Category
+- Author
+
+## Examples
+
+### Search All Content
+
+Search for "education" across all content types:
+
+```bash
+dzdk search --query "education"
+```
+
+### Search Specific Type
+
+Search only within services:
+
+```bash
+dzdk search --query "healthcare" --type services
+```
+
+### Limit Results
+
+Return only the top 5 matches:
+
+```bash
+dzdk search --query "community" --type events --limit 5
+```
+
+### Search Photos by Location
+
+```bash
+dzdk search --query "market" --type photos
+```
+
+### Search Resources by Author
+
+```bash
+dzdk search --query "Smith" --type resources --limit 20
+```
+
+## Output Format
+
+Search results are displayed in panels with the following information:
+
+### For Services
+- Title and description
+- Contact email
+- Location address
+
+### For Events
+- Title and description
+- Date and time
+- Location
+
+### For Photos
+- Title and description
+- Photographer name
+- Location
+
+### For Resources
+- Title and description
+- Author
+- Category
+
+## Result Ranking
+
+Results are ranked by relevance:
+1. Matches in title fields are weighted higher
+2. Matches in description fields
+3. Results are sorted by the number of field matches
+4. Limited to the specified `--limit` value
+
+## Search Summary
+
+After displaying results, a summary panel shows:
+- Total number of results found
+- Number of categories searched
+
+## Error Handling
+
+If no results are found:
+```bash
+No matching items found
+```
+
+If a specific content type fails to fetch:
+```bash
+Warning: Error searching [type]: [error message]
+```
+
+The search continues with other types even if one fails.
+
+## Notes
+
+- Search is case-insensitive
+- Partial matches are supported
+- Search uses string matching (not full-text search)
+- All results are fetched from the API in real-time

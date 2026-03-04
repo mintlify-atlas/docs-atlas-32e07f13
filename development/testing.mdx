@@ -1,0 +1,568 @@
+---
+title: Testing
+description: Guide to running and writing tests for the Dzaleka Digital Heritage CLI
+---
+
+# Testing Guide
+
+This guide covers how to run tests, understand the test structure, and write new tests for the DZDK CLI.
+
+## Overview
+
+The DZDK CLI uses **pytest** as its testing framework, with additional plugins for coverage reporting and mocking.
+
+### Testing Stack
+
+- **pytest 8.0.0** - Main testing framework
+- **pytest-cov 4.1.0** - Code coverage reporting
+- **pytest-mock 3.12.0** - Mocking and patching utilities
+- **Click Testing** - Built-in CLI testing utilities from the Click framework
+
+## Running Tests
+
+### Prerequisites
+
+Ensure you have installed development dependencies:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+### Basic Test Execution
+
+Run all tests:
+
+```bash
+pytest
+```
+
+Run tests with verbose output:
+
+```bash
+pytest -v
+```
+
+Run tests with detailed output:
+
+```bash
+pytest -vv
+```
+
+### Running Specific Tests
+
+Run a specific test file:
+
+```bash
+pytest tests/test_cli.py
+```
+
+Run a specific test function:
+
+```bash
+pytest tests/test_cli.py::test_health_command
+```
+
+Run tests matching a pattern:
+
+```bash
+pytest -k "health"
+```
+
+### Code Coverage
+
+Run tests with coverage report:
+
+```bash
+pytest --cov=dzdk tests/
+```
+
+Generate HTML coverage report:
+
+```bash
+pytest --cov=dzdk --cov-report=html tests/
+```
+
+This creates a `htmlcov/` directory. Open `htmlcov/index.html` in your browser to view detailed coverage.
+
+Generate coverage report with missing lines:
+
+```bash
+pytest --cov=dzdk --cov-report=term-missing tests/
+```
+
+### Test Output Options
+
+Show print statements during test execution:
+
+```bash
+pytest -s
+```
+
+Stop on first failure:
+
+```bash
+pytest -x
+```
+
+Show local variables in tracebacks:
+
+```bash
+pytest -l
+```
+
+## Test Structure
+
+Tests are located in the `tests/` directory:
+
+```
+tests/
+├── __init__.py          # Test package initialization
+└── test_cli.py          # Main CLI command tests
+```
+
+### Test File Organization
+
+The `test_cli.py` file contains tests for all CLI commands, organized by functionality:
+
+1. **Fixtures** - Reusable test components
+2. **Command Tests** - Tests for each CLI command
+3. **Error Handling Tests** - Tests for error scenarios
+4. **Integration Tests** - End-to-end workflow tests
+
+## Test Fixtures
+
+Fixtures provide reusable test components. Here are the main fixtures used:
+
+### `runner` Fixture
+
+Provides a Click CLI test runner:
+
+```python
+@pytest.fixture
+def runner():
+    """Create a CLI runner fixture."""
+    return CliRunner()
+```
+
+Usage:
+```python
+def test_health_command(runner):
+    result = runner.invoke(cli, ['health'])
+    assert result.exit_code == 0
+```
+
+### `mock_config_file` Fixture
+
+Creates a temporary configuration file:
+
+```python
+@pytest.fixture
+def mock_config_file(tmp_path):
+    """Create a temporary config file for testing."""
+    config = {
+        'api_url': 'https://test-api.com/api',
+        'timeout': 30
+    }
+    config_file = tmp_path / 'config.yaml'
+    with open(config_file, 'w') as f:
+        yaml.dump(config, f)
+    return config_file
+```
+
+### `mock_env` Fixture
+
+Sets up test environment variables:
+
+```python
+@pytest.fixture
+def mock_env(monkeypatch, tmp_path):
+    """Set up test environment variables."""
+    monkeypatch.setenv('DZDK_CONFIG_DIR', str(tmp_path))
+    return tmp_path
+```
+
+### `mock_requests` Fixture
+
+Mocks HTTP requests to the API:
+
+```python
+@pytest.fixture
+def mock_requests(mocker):
+    """Mock requests for API calls."""
+    mock = mocker.patch('requests.get')
+    
+    # Configure mock responses for different endpoints
+    def mock_get(url, *args, **kwargs):
+        if 'health' in url:
+            return health_response
+        elif 'services' in url:
+            return services_response
+        # ...
+    
+    mock.side_effect = mock_get
+    return mock
+```
+
+## Writing Tests
+
+### Basic Test Structure
+
+Follow this structure for writing tests:
+
+```python
+def test_command_name(runner, mock_requests):
+    """Test description explaining what is being tested."""
+    # Arrange - Set up test data and mocks
+    
+    # Act - Execute the command
+    result = runner.invoke(cli, ['command', 'subcommand', '--option', 'value'])
+    
+    # Assert - Verify the results
+    assert result.exit_code == 0
+    assert 'expected output' in result.output
+```
+
+### Testing CLI Commands
+
+#### Example: Testing a List Command
+
+```python
+def test_services_list_command(runner, mock_requests):
+    """Test the services list command."""
+    result = runner.invoke(cli, ['services', 'list'])
+    assert result.exit_code == 0
+    assert 'Test Service' in result.output
+    assert 'Test Category' in result.output
+```
+
+#### Example: Testing with Options
+
+```python
+def test_services_list_with_search(runner, mock_requests):
+    """Test services list with search filter."""
+    result = runner.invoke(cli, ['services', 'list', '--search', 'health'])
+    assert result.exit_code == 0
+    assert 'health' in result.output.lower()
+```
+
+#### Example: Testing Configuration
+
+```python
+def test_config_command_direct(runner, mock_env):
+    """Test direct configuration with parameters."""
+    result = runner.invoke(cli, [
+        'config',
+        '--url', 'https://direct-api.com',
+        '--timeout', '60'
+    ])
+    assert result.exit_code == 0
+    assert 'Configuration updated successfully' in result.output
+```
+
+### Testing File Operations
+
+Use `tmp_path` fixture for file operations:
+
+```python
+def test_photo_upload_command(runner, tmp_path):
+    """Test photo upload command"""
+    # Create a test file
+    test_image = tmp_path / 'test_image.jpg'
+    test_image.write_bytes(b'fake image data')
+    
+    with patch('os.path.getsize', return_value=1024):
+        with patch('requests.post') as mock_post:
+            mock_post.return_value.status_code = 200
+            mock_post.return_value.json.return_value = {
+                'id': '123',
+                'title': 'Test Photo',
+                'url': 'https://example.com/photo.jpg'
+            }
+            
+            result = runner.invoke(cli, [
+                'photos', 'upload',
+                '--file', str(test_image),
+                '--title', 'Test Photo'
+            ])
+            
+            assert result.exit_code == 0
+            assert 'Photo uploaded successfully' in result.output
+```
+
+### Testing Error Handling
+
+Test various error scenarios:
+
+```python
+def test_error_handling(runner):
+    """Test error handling in various commands."""
+    with patch('requests.get') as mock_get:
+        mock_get.side_effect = Exception('Network error')
+        result = runner.invoke(cli, ['health'])
+        assert result.exit_code == 1
+        assert 'Network error' in result.output
+```
+
+#### Testing HTTP Errors
+
+```python
+def test_http_error_handling(runner):
+    """Test handling of HTTP errors."""
+    with patch('requests.get') as mock_get:
+        mock_response = Mock()
+        mock_response.status_code = 404
+        mock_response.raise_for_status.side_effect = \
+            requests.exceptions.HTTPError('404 Not Found')
+        mock_get.return_value = mock_response
+        
+        result = runner.invoke(cli, ['services', 'list'])
+        assert result.exit_code == 1
+        assert 'HTTP Error' in result.output
+```
+
+#### Testing Validation
+
+```python
+def test_file_size_limit(runner, tmp_path):
+    """Test file size limit for uploads."""
+    large_file = tmp_path / 'large.jpg'
+    large_file.write_bytes(b'x' * (11 * 1024 * 1024))  # 11MB
+    
+    result = runner.invoke(cli, [
+        'photos', 'upload',
+        '--file', str(large_file),
+        '--title', 'Large Photo'
+    ])
+    assert result.exit_code == 1
+    assert 'File size exceeds 10MB limit' in result.output
+```
+
+### Mocking API Responses
+
+Use `patch` to mock API responses:
+
+```python
+def test_fetch_resource(runner, tmp_path):
+    """Test resource download functionality."""
+    with patch('requests.get') as mock_get, \
+         patch('requests.head') as mock_head:
+        # Mock initial request
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {
+            'status': 'success',
+            'data': {
+                'resource': {
+                    'downloadUrl': 'https://test.com/resource.pdf'
+                }
+            }
+        }
+        
+        # Mock HEAD request for file size
+        mock_head.return_value.headers = {'content-length': '1000'}
+        
+        # Mock download
+        mock_get.return_value.iter_content.return_value = [
+            b'chunk1', b'chunk2'
+        ]
+        
+        output_file = tmp_path / 'downloaded.pdf'
+        result = runner.invoke(cli, [
+            'resources', 'fetch',
+            '--id', '123',
+            '--output', str(output_file)
+        ])
+        
+        assert result.exit_code == 0
+        assert 'Resource successfully saved' in result.output
+```
+
+## Test Best Practices
+
+### 1. Test Names
+
+- Use descriptive names starting with `test_`
+- Name should describe what is being tested
+- Examples:
+  - `test_health_command`
+  - `test_services_list_with_pagination`
+  - `test_photo_upload_file_not_found`
+
+### 2. Test Documentation
+
+- Include docstrings explaining the test purpose
+- Document any non-obvious setup or assertions
+
+```python
+def test_batch_download(runner, tmp_path):
+    """Test batch download functionality.
+    
+    Verifies that multiple resources can be downloaded
+    in a single operation with proper error handling.
+    """
+    # test implementation
+```
+
+### 3. Arrange-Act-Assert Pattern
+
+Organize tests using the AAA pattern:
+
+```python
+def test_example(runner):
+    """Test example following AAA pattern."""
+    # Arrange - Set up test data
+    test_data = {'key': 'value'}
+    
+    # Act - Execute the code being tested
+    result = runner.invoke(cli, ['command'])
+    
+    # Assert - Verify the results
+    assert result.exit_code == 0
+    assert 'expected' in result.output
+```
+
+### 4. Test Independence
+
+- Each test should be independent
+- Don't rely on test execution order
+- Use fixtures for shared setup
+- Clean up any created resources
+
+### 5. Mock External Dependencies
+
+- Always mock HTTP requests to APIs
+- Mock file system operations when appropriate
+- Use fixtures for consistent mocking
+
+### 6. Test Edge Cases
+
+- Test both success and failure scenarios
+- Test boundary conditions (empty lists, max values, etc.)
+- Test invalid inputs and error handling
+
+### 7. Keep Tests Fast
+
+- Use mocks to avoid actual API calls
+- Don't include unnecessary `sleep()` calls
+- Run expensive tests separately if needed
+
+## Common Testing Patterns
+
+### Pattern: Testing Interactive Prompts
+
+```python
+def test_config_command_interactive(runner, mock_env):
+    """Test interactive configuration mode."""
+    with patch('click.prompt', side_effect=['https://new-api.com', '45']):
+        result = runner.invoke(cli, ['config', '--interactive'])
+        assert result.exit_code == 0
+        assert 'Configuration has been updated successfully' in result.output
+```
+
+### Pattern: Testing Progress Indicators
+
+```python
+def test_command_with_progress(runner):
+    """Test command that shows progress indicator."""
+    with patch('requests.get') as mock_get:
+        mock_get.return_value.status_code = 200
+        # ...
+        result = runner.invoke(cli, ['batch', 'download', ...])
+        # Progress indicator doesn't appear in captured output
+        # Test the final result instead
+        assert 'Download Complete' in result.output
+```
+
+### Pattern: Testing Configuration Loading
+
+```python
+def test_invalid_config(runner, mock_env):
+    """Test handling of invalid configuration."""
+    with patch('yaml.safe_load', side_effect=yaml.YAMLError('Invalid YAML')):
+        result = runner.invoke(cli, ['show-config'])
+        assert result.exit_code == 1
+        assert 'Invalid YAML' in result.output
+```
+
+## Debugging Tests
+
+### Print Debug Information
+
+```python
+def test_with_debug(runner):
+    result = runner.invoke(cli, ['health'])
+    print(f"Exit code: {result.exit_code}")
+    print(f"Output: {result.output}")
+    print(f"Exception: {result.exception}")
+    assert result.exit_code == 0
+```
+
+Run with `-s` flag to see print output:
+```bash
+pytest -s tests/test_cli.py::test_with_debug
+```
+
+### Use PDB Debugger
+
+```python
+def test_with_pdb(runner):
+    result = runner.invoke(cli, ['health'])
+    import pdb; pdb.set_trace()
+    assert result.exit_code == 0
+```
+
+### Check Exception Details
+
+```python
+def test_exception_handling(runner):
+    result = runner.invoke(cli, ['health'])
+    if result.exception:
+        import traceback
+        traceback.print_exception(type(result.exception),
+                                 result.exception,
+                                 result.exception.__traceback__)
+```
+
+## Continuous Integration
+
+Tests run automatically on:
+
+- Pull request creation
+- Commits to main branch
+- Manual workflow dispatch
+
+Ensure all tests pass before submitting a PR:
+
+```bash
+# Run full test suite with coverage
+pytest --cov=dzdk --cov-report=term-missing tests/
+
+# Check code formatting
+black --check dzdk.py tests/
+
+# Check linting
+flake8 dzdk.py tests/
+
+# Type checking
+mypy dzdk.py
+```
+
+## Test Coverage Goals
+
+- **Minimum coverage**: 80%
+- **Target coverage**: 90%+
+- Focus on critical paths and error handling
+- Don't sacrifice test quality for coverage numbers
+
+View current coverage:
+```bash
+pytest --cov=dzdk --cov-report=term-missing tests/
+```
+
+## Need Help?
+
+If you need help with testing:
+
+- Check existing tests in `tests/test_cli.py` for examples
+- Review the [pytest documentation](https://docs.pytest.org/)
+- See the [Contributing Guide](/development/contributing) for getting started
+- Open an issue on GitHub for specific questions

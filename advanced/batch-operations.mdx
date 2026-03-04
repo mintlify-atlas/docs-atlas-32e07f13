@@ -1,0 +1,439 @@
+---
+title: Batch Operations
+description: Upload and download multiple files efficiently with progress tracking and concurrent processing
+icon: layer-group
+---
+
+## Overview
+
+Batch operations enable you to upload or download multiple files in a single command. The CLI provides visual progress tracking, error handling, and efficient file processing for bulk operations.
+
+### Use Cases
+
+- Download multiple resources or photos at once
+- Bulk upload photo collections
+- Archive entire resource collections
+- Backup cultural heritage content
+- Migrate content between systems
+
+### Benefits
+
+- **Time-saving**: Process multiple files without manual iteration
+- **Progress tracking**: Real-time progress bars and status updates
+- **Error resilience**: Individual failures don't stop the entire batch
+- **Organized output**: Files saved to structured directories
+- **Size validation**: Automatic checks for file size limits
+
+## Batch Download
+
+Download multiple resources or photos by providing their IDs.
+
+### Basic Download
+
+```bash
+dzdk batch download --type resources --ids "123,456,789"
+```
+
+This downloads three resources to the default `downloads/` directory.
+
+### Download Photos
+
+```bash
+dzdk batch download --type photos --ids "abc,def,ghi" --output-dir my-photos
+```
+
+<Note>
+The `--ids` parameter accepts comma-separated values. You can use either numeric IDs or slug identifiers depending on the API's response format.
+</Note>
+
+### Custom Output Directory
+
+Specify where files should be saved:
+
+```bash
+dzdk batch download \
+  --type resources \
+  --ids "report-1,report-2,report-3" \
+  --output-dir ~/Documents/dzaleka-reports
+```
+
+The CLI automatically creates the directory if it doesn't exist.
+
+## Batch Upload
+
+Upload multiple files from a directory in one operation.
+
+### Upload Photos from Directory
+
+```bash
+dzdk batch upload --directory ./my-photos --type photos
+```
+
+This uploads all compatible image files from the specified directory.
+
+<Tabs>
+  <Tab title="Supported Formats">
+    The batch upload currently supports:
+    - `.jpg` / `.jpeg`
+    - `.png`
+    
+    Files are filtered by extension before upload.
+  </Tab>
+  
+  <Tab title="File Discovery">
+    ```python
+    # dzdk.py:1859-1860
+    if type == 'photos':
+        files = list(dir_path.glob('*.{jpg,jpeg,png}'))
+    ```
+    
+    The CLI uses glob patterns to find compatible files.
+  </Tab>
+</Tabs>
+
+### Size Limitations
+
+<Warning>
+Files larger than 10MB are automatically skipped with a warning message.
+</Warning>
+
+```python
+# dzdk.py:1881-1883
+if file.stat().st_size > 10 * 1024 * 1024:  # 10MB limit
+    console.print(f"[yellow]Warning: File too large: {file.name}[/yellow]")
+    continue
+```
+
+## Command Reference
+
+### Batch Download Syntax
+
+```bash
+dzdk batch download --type <content_type> --ids <id_list> [options]
+```
+
+#### Required Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `--type` | choice | Content type: `resources` or `photos` |
+| `--ids` | string | Comma-separated list of item IDs or slugs |
+
+#### Optional Flags
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--output-dir` | path | `downloads` | Output directory for downloaded files |
+
+### Batch Upload Syntax
+
+```bash
+dzdk batch upload --directory <path> --type <content_type>
+```
+
+#### Required Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `--directory` | path | Directory containing files to upload (must exist) |
+| `--type` | choice | Content type: currently only `photos` supported |
+
+## Progress Tracking
+
+Batch operations display rich progress information:
+
+```python
+# dzdk.py:1786-1793
+with Progress(
+    SpinnerColumn(),
+    TextColumn("[progress.description]{task.description}"),
+    BarColumn(),
+    TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+    TimeRemainingColumn(),
+    console=console
+) as progress:
+    task = progress.add_task(f"[cyan]Downloading {type}...", total=len(id_list))
+```
+
+You'll see:
+- **Spinner**: Animated indicator showing activity
+- **Description**: Current operation being performed
+- **Progress bar**: Visual representation of completion
+- **Percentage**: Numeric progress (0-100%)
+- **Time remaining**: Estimated time until completion
+
+### Example Progress Output
+
+```
+⠋ Downloading resources... ━━━━━━━━━╸━━━━━━━━━━━  45%  00:23
+✓ Downloaded: Annual Report 2023.pdf
+✓ Downloaded: Community Survey.pdf
+✗ Error downloading report-3: Connection timeout
+```
+
+## Download Implementation
+
+The download process follows these steps:
+
+### Step 1: Directory Setup
+
+```python
+# dzdk.py:1779-1781
+output_path = Path(output_dir)
+output_path.mkdir(parents=True, exist_ok=True)
+```
+
+Creates the output directory and any necessary parent directories.
+
+### Step 2: ID Parsing
+
+```python
+# dzdk.py:1784
+id_list = [id.strip() for id in ids.split(',')]
+```
+
+Splits the comma-separated ID string and removes whitespace.
+
+### Step 3: Item Lookup
+
+```python
+# dzdk.py:1798-1807
+response = requests.get(f"{BASE_URL}/{type}", timeout=TIMEOUT)
+data = format_response(response)
+
+items = data.get('data', {}).get(type, [])
+item = next((i for i in items if i.get('id') == item_id or i.get('slug') == item_id), None)
+```
+
+Fetches all items and finds the matching item by ID or slug.
+
+### Step 4: File Download
+
+```python
+# dzdk.py:1820-1836
+response = requests.get(download_url, stream=True, timeout=TIMEOUT)
+response.raise_for_status()
+
+file_path = output_path / filename
+with open(file_path, 'wb') as f:
+    for chunk in response.iter_content(chunk_size=8192):
+        if chunk:
+            f.write(chunk)
+            progress.update(task, advance=len(chunk))
+```
+
+Streams the file in chunks for memory efficiency and updates progress.
+
+## Upload Implementation
+
+The upload process:
+
+### Step 1: File Discovery
+
+```python
+# dzdk.py:1858-1862
+dir_path = Path(directory)
+if type == 'photos':
+    files = list(dir_path.glob('*.{jpg,jpeg,png}'))
+else:
+    files = []
+```
+
+Finds all compatible files in the directory.
+
+### Step 2: Size Validation
+
+```python
+# dzdk.py:1881-1883
+if file.stat().st_size > 10 * 1024 * 1024:  # 10MB limit
+    console.print(f"[yellow]Warning: File too large: {file.name}[/yellow]")
+    continue
+```
+
+Checks each file against the size limit.
+
+### Step 3: File Upload
+
+```python
+# dzdk.py:1886-1895
+with open(file, 'rb') as f:
+    files = {'file': f}
+    data = {'title': file.stem}
+    
+    response = requests.post(
+        f"{BASE_URL}/{type}",
+        files=files,
+        data=data,
+        timeout=TIMEOUT
+    )
+```
+
+POSTs each file with multipart form data.
+
+## Error Handling
+
+Batch operations continue even when individual items fail:
+
+<Tabs>
+  <Tab title="Download Errors">
+    ```python
+    # dzdk.py:1840-1843
+    except Exception as e:
+        console.print(f"[red]Error downloading {item_id}: {str(e)}[/red]")
+    
+    progress.update(task, advance=1)
+    ```
+    
+    Errors are logged but don't stop the batch process.
+  </Tab>
+  
+  <Tab title="Upload Errors">
+    ```python
+    # dzdk.py:1901-1903
+    except Exception as e:
+        console.print(f"[red]Error uploading {file.name}: {str(e)}[/red]")
+    
+    progress.update(task, advance=1)
+    ```
+    
+    Failed uploads are reported individually.
+  </Tab>
+</Tabs>
+
+## Performance Tips
+
+<Tip>
+**Optimize batch operations:**
+- Keep batch sizes reasonable (10-50 items) for better error tracking
+- Use absolute paths for directories to avoid confusion
+- Pre-filter files by size before attempting upload
+- Run downloads during off-peak hours for large batches
+- Check available disk space before large download operations
+</Tip>
+
+## Concurrent Processing
+
+While the batch commands process files sequentially, the CLI uses concurrent processing for other operations:
+
+```python
+# dzdk.py:207-214
+with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+    future_to_endpoint = {
+        executor.submit(check_endpoint, endpoint): endpoint 
+        for endpoint in API_ENDPOINTS.values()
+    }
+    results = []
+    for future in concurrent.futures.as_completed(future_to_endpoint):
+        results.append(future.result())
+```
+
+This pattern (from the health check command) demonstrates how the CLI can process multiple requests concurrently with up to 5 worker threads.
+
+<Note>
+Future versions may implement concurrent downloads/uploads for improved performance on large batches.
+</Note>
+
+## Best Practices
+
+### Downloading Resources
+
+1. **Organize by type**: Use descriptive output directories
+   ```bash
+   dzdk batch download --type resources --ids "1,2,3" --output-dir reports-2024
+   ```
+
+2. **Verify IDs first**: List resources to confirm IDs before downloading
+   ```bash
+   dzdk resources list
+   dzdk batch download --type resources --ids "confirmed-ids"
+   ```
+
+3. **Handle large batches**: Split very large downloads into smaller batches
+   ```bash
+   dzdk batch download --type photos --ids "1,2,3,4,5" --output-dir batch-1
+   dzdk batch download --type photos --ids "6,7,8,9,10" --output-dir batch-2
+   ```
+
+### Uploading Photos
+
+1. **Prepare files**: Organize files in a dedicated directory before upload
+   ```bash
+   mkdir upload-ready
+   cp selected-photos/*.jpg upload-ready/
+   dzdk batch upload --directory upload-ready --type photos
+   ```
+
+2. **Check file sizes**: Ensure files are under 10MB limit
+   ```bash
+   find upload-ready -type f -size +10M
+   ```
+
+3. **Use meaningful filenames**: The file stem becomes the title
+   ```bash
+   # Good: dzaleka-market-2024.jpg → Title: "dzaleka-market-2024"
+   # Avoid: IMG_1234.jpg → Title: "IMG_1234"
+   ```
+
+## Common Workflows
+
+<AccordionGroup>
+  <Accordion title="Archive all resources">
+    1. List all resources to get IDs
+    2. Copy IDs to a comma-separated list
+    3. Download to an archive directory
+    
+    ```bash
+    dzdk resources list
+    dzdk batch download --type resources --ids "id1,id2,id3,..." --output-dir archive/resources
+    ```
+  </Accordion>
+  
+  <Accordion title="Upload event photos">
+    1. Collect photos in a directory
+    2. Rename files with descriptive names
+    3. Upload the batch
+    
+    ```bash
+    mkdir event-photos
+    # ... copy and rename photos ...
+    dzdk batch upload --directory event-photos --type photos
+    ```
+  </Accordion>
+  
+  <Accordion title="Mirror content locally">
+    1. Export data to CSV for reference
+    2. Download all resources and photos
+    3. Organize by type in local directories
+    
+    ```bash
+    dzdk export csv --type resources --output resources.csv
+    dzdk batch download --type resources --ids "$(cat ids.txt)" --output-dir local/resources
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Completion Summary
+
+After each batch operation, you'll see a summary:
+
+```python
+# dzdk.py:1845-1848 (Download)
+console.print(create_info_panel(
+    "Download Complete",
+    f"Files have been downloaded to: {output_path.absolute()}"
+))
+```
+
+```python
+# dzdk.py:1905-1908 (Upload)
+console.print(create_info_panel(
+    "Upload Complete",
+    f"Successfully processed {len(files)} files"
+))
+```
+
+## Next Steps
+
+- Use [search functionality](/advanced/search) to find items for batch download
+- Combine with [export commands](/advanced/export) to create manifest files
+- Try the [interactive shell](/advanced/interactive-shell) for iterative batch operations

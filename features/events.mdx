@@ -1,0 +1,260 @@
+---
+title: 'Events Browsing'
+description: 'Discover and track community events in Dzaleka'
+icon: 'calendar'
+---
+
+## Overview
+
+The events browsing feature helps you discover upcoming and past events in the Dzaleka community. Search, filter, and view detailed information about cultural events, workshops, meetings, and community gatherings.
+
+<CardGroup cols={2}>
+  <Card title="Browse Events" icon="calendar-days">
+    View all events with pagination and filtering
+  </Card>
+  <Card title="Event Details" icon="calendar-check">
+    Access complete event information including dates and registration
+  </Card>
+  <Card title="Filter Events" icon="filter">
+    Filter by category, status, or search terms
+  </Card>
+  <Card title="Registration Info" icon="clipboard-check">
+    View registration requirements and deadlines
+  </Card>
+</CardGroup>
+
+## Listing Events
+
+### Basic Usage
+
+List all events (12 per page):
+
+```bash
+dzdk events list
+```
+
+### Filtering Options
+
+<Tabs>
+  <Tab title="Search">
+    Search across event titles, descriptions, and categories:
+    
+    ```bash
+    dzdk events list --search "workshop"
+    dzdk events list --search "cultural"
+    dzdk events list --search "music"
+    ```
+  </Tab>
+  
+  <Tab title="Category">
+    Filter by event category:
+    
+    ```bash
+    dzdk events list --category "workshop"
+    dzdk events list --category "cultural"
+    dzdk events list --category "education"
+    ```
+  </Tab>
+  
+  <Tab title="Status">
+    Filter by event status:
+    
+    ```bash
+    dzdk events list --status active
+    dzdk events list --status inactive
+    dzdk events list --status unknown
+    ```
+  </Tab>
+</Tabs>
+
+### Sorting Results
+
+Sort events by different criteria:
+
+```bash
+# Sort by title (default)
+dzdk events list --sort-by title --sort-order asc
+
+# Sort by category
+dzdk events list --sort-by category --sort-order desc
+
+# Sort by status
+dzdk events list --sort-by status
+```
+
+### Pagination
+
+Navigate through multiple pages of events:
+
+```bash
+# View specific page
+dzdk events list --page 2
+dzdk events list --page 3
+
+# Combine with filters
+dzdk events list --page 2 --category "workshop" --status active
+```
+
+### Output Format
+
+Events are displayed in a formatted table:
+
+```
+┌────────────────────────┬──────────────────┬──────────────┬──────────┬──────────────┐
+│ Title                  │ Date             │ Location     │ Status   │ Category     │
+├────────────────────────┼──────────────────┼──────────────┼──────────┼──────────────┤
+│ Community Art Workshop │ 2026-03-15 14:00 │ Zone 3       │ active   │ workshop     │
+│ Cultural Festival      │ 2026-03-20 10:00 │ Central Hall │ active   │ cultural     │
+└────────────────────────┴──────────────────┴──────────────┴──────────┴──────────────┘
+
+Navigation Commands:
+• To view next page: dzdk events list --page 2
+• To view previous page: dzdk events list --page 1
+• To view specific page: dzdk events list --page <number>
+
+Showing events 1-12 of 45
+```
+
+## Event Details
+
+### Get Specific Event
+
+View comprehensive information about an event:
+
+```bash
+dzdk events get --id <event-id>
+dzdk events get --id community-art-workshop
+```
+
+### Information Displayed
+
+<AccordionGroup>
+  <Accordion title="Event Basics">
+    - Event title and description
+    - Start date and time
+    - End date (if applicable)
+    - Location details
+    - Event category
+    - Organizer information
+    - Current status
+    - Event tags
+  </Accordion>
+  
+  <Accordion title="Contact Information">
+    - Email address
+    - Phone number
+    - WhatsApp contact (if available)
+  </Accordion>
+  
+  <Accordion title="Registration Details">
+    - Whether registration is required
+    - Registration URL (if available)
+    - Registration deadline
+    - Additional registration instructions
+  </Accordion>
+</AccordionGroup>
+
+### Example Output
+
+```
+╭─────────────── Event: Community Art Workshop ───────────────╮
+│ Event Details                                                │
+│ Title: Community Art Workshop                                │
+│ Description: A hands-on workshop for community artists       │
+│ Date: 2026-03-15 14:00                                      │
+│ End Date: 2026-03-15 17:00                                  │
+│ Location: Zone 3 Community Center                            │
+│ Category: workshop                                           │
+│ Organizer: Arts Collective                                   │
+│ Status: active                                               │
+│ Tags: art, workshop, community                               │
+│                                                              │
+│ Contact Information                                          │
+│ Email: arts@dzaleka.org                                      │
+│ Phone: +265999123456                                         │
+│ WhatsApp: +265999123456                                      │
+│                                                              │
+│ Registration                                                 │
+│ Registration Required: Yes                                   │
+│ Registration URL: https://dzaleka.org/events/register        │
+│ Registration Deadline: 2026-03-14 23:59                      │
+╰──────────────────────────────────────────────────────────────╯
+```
+
+## Use Cases
+
+### Find Upcoming Workshops
+
+```bash
+# Search for workshops
+dzdk events list --search "workshop" --status active
+
+# View workshop details
+dzdk events get --id art-workshop-2026
+```
+
+### Browse Cultural Events
+
+```bash
+# Filter by cultural category
+dzdk events list --category "cultural" --sort-by title
+
+# View multiple pages
+dzdk events list --category "cultural" --page 2
+```
+
+### Check Event Registration
+
+```bash
+# Find events requiring registration
+dzdk events list --search "registration"
+
+# Get registration details
+dzdk events get --id community-meeting-03
+```
+
+### Filter by Location
+
+```bash
+# Search for events in specific zone
+dzdk events list --search "zone 3"
+dzdk events list --search "central hall"
+```
+
+## Command Reference
+
+### events list
+
+**Options:**
+- `--search TEXT` - Search term to filter events
+- `--category TEXT` - Filter by category
+- `--status [active|inactive|unknown]` - Filter by status
+- `--sort-by [title|category|status]` - Sort results by field (default: title)
+- `--sort-order [asc|desc]` - Sort order (default: asc)
+- `--page INTEGER` - Page number to view (default: 1)
+
+**Features:**
+- 12 events per page
+- Automatic date formatting (YYYY-MM-DD HH:MM)
+- Navigation instructions included
+- Total event count displayed
+
+### events get
+
+**Options:**
+- `--id TEXT` - Event ID or slug (required)
+
+**Output:**
+- Complete event information panel
+- Formatted dates and times
+- Contact information
+- Registration details
+- Event tags
+
+<Tip>
+  Dates are displayed in 24-hour format (YYYY-MM-DD HH:MM) for clarity.
+</Tip>
+
+<Warning>
+  Event IDs are case-sensitive. Use the exact ID shown in the list output.
+</Warning>

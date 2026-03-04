@@ -1,0 +1,364 @@
+---
+title: 'dzdk photos'
+description: 'Manage photos including uploads, listings, albums, and metadata'
+---
+
+## Overview
+
+The `dzdk photos` command group allows you to manage the Dzaleka photo archive. You can list photos, upload new images, create and manage albums, edit photo metadata, and view detailed photo information.
+
+## Commands
+
+### dzdk photos list
+
+List available photos with filtering, sorting, and pagination support.
+
+```bash
+dzdk photos list [OPTIONS]
+```
+
+#### Options
+
+<ParamField path="--search" type="string">
+  Search term to filter photos. Searches across title, description, and category fields.
+</ParamField>
+
+<ParamField path="--category" type="string">
+  Filter photos by category name.
+</ParamField>
+
+<ParamField path="--status" type="string">
+  Filter by photo status. Available values: `active`, `inactive`, `unknown`.
+</ParamField>
+
+<ParamField path="--sort-by" type="string" default="title">
+  Sort results by field. Available values: `title`, `category`, `status`.
+</ParamField>
+
+<ParamField path="--sort-order" type="string" default="asc">
+  Sort order for results. Available values: `asc` (ascending), `desc` (descending).
+</ParamField>
+
+<ParamField path="--page" type="integer" default="1">
+  Page number to view. Photos are displayed 12 per page.
+</ParamField>
+
+#### Examples
+
+```bash
+# List all photos (first page)
+dzdk photos list
+
+# Search for photos about events
+dzdk photos list --search event
+
+# Filter by portrait category
+dzdk photos list --category portrait
+
+# Sort by title in descending order
+dzdk photos list --sort-by title --sort-order desc
+
+# View second page of results
+dzdk photos list --page 2
+```
+
+#### Output Format
+
+The command displays a table with the following columns:
+- **Title**: Photo title
+- **Date**: Date photo was taken (YYYY-MM-DD format)
+- **Photographer**: Photographer name
+- **Location**: Photo location
+- **Tags**: Comma-separated list of tags
+
+---
+
+### dzdk photos upload
+
+Upload a photo to the Dzaleka archive.
+
+```bash
+dzdk photos upload --file <path> --title <title> [OPTIONS]
+```
+
+#### Options
+
+<ParamField path="--file" type="path" required>
+  Path to the image file to upload. File must exist and be accessible.
+</ParamField>
+
+<ParamField path="--title" type="string" required>
+  Title for the photo. This is a required parameter.
+</ParamField>
+
+<ParamField path="--description" type="string">
+  Description of the photo. Optional but recommended for context.
+</ParamField>
+
+#### Examples
+
+```bash
+# Upload a photo with title only
+dzdk photos upload --file ./image.jpg --title "Community Event"
+
+# Upload with title and description
+dzdk photos upload --file /path/to/photo.jpg --title "Market Scene" --description "Daily market activity in Dzaleka"
+```
+
+#### Upload Requirements
+
+- Maximum file size: 10MB
+- File must exist at the specified path
+- Supported formats: JPG, JPEG, PNG, and other common image formats
+
+#### Output
+
+Displays upload progress and success information including:
+- Photo ID
+- Title
+- URL of uploaded photo
+
+---
+
+### dzdk photos edit
+
+Edit photo metadata.
+
+```bash
+dzdk photos edit --id <photo-id> [OPTIONS]
+```
+
+#### Options
+
+<ParamField path="--id" type="string" required>
+  Photo ID to edit. This is a required parameter.
+</ParamField>
+
+<ParamField path="--title" type="string">
+  New title for the photo.
+</ParamField>
+
+<ParamField path="--description" type="string">
+  New description for the photo.
+</ParamField>
+
+<ParamField path="--tags" type="string">
+  Comma-separated list of tags to assign to the photo.
+</ParamField>
+
+<ParamField path="--location" type="string">
+  Photo location.
+</ParamField>
+
+<ParamField path="--date" type="string">
+  Photo date in YYYY-MM-DD format.
+</ParamField>
+
+#### Examples
+
+```bash
+# Update photo title
+dzdk photos edit --id photo-123 --title "New Title"
+
+# Update multiple fields
+dzdk photos edit --id photo-123 --title "Market Day" --description "Weekly market" --location "Dzaleka Camp"
+
+# Update tags
+dzdk photos edit --id photo-123 --tags "market,community,daily life"
+
+# Update date
+dzdk photos edit --id photo-123 --date "2026-03-01"
+```
+
+---
+
+### dzdk photos metadata
+
+Show detailed photo metadata including technical information.
+
+```bash
+dzdk photos metadata --id <photo-id>
+```
+
+#### Options
+
+<ParamField path="--id" type="string" required>
+  Photo ID or slug to retrieve metadata for.
+</ParamField>
+
+#### Examples
+
+```bash
+# View photo metadata
+dzdk photos metadata --id photo-123
+
+# View metadata by slug
+dzdk photos metadata --id community-event-2026
+```
+
+#### Output Format
+
+Displays three information panels:
+
+**Basic Information**
+- Title
+- Description
+- Date taken
+- Location
+- Photographer name
+
+**Technical Information**
+- Camera model
+- Lens used
+- Exposure settings
+- Aperture
+- ISO value
+- Focal length
+
+**File Information**
+- File format
+- File size
+- Image dimensions
+- Resolution
+- Photo URL
+
+---
+
+## Album Management
+
+### dzdk photos album create
+
+Create a new photo album.
+
+```bash
+dzdk photos album create --name <name> [OPTIONS]
+```
+
+#### Options
+
+<ParamField path="--name" type="string" required>
+  Album name. This is a required parameter.
+</ParamField>
+
+<ParamField path="--description" type="string">
+  Album description. Optional but recommended.
+</ParamField>
+
+<ParamField path="--tags" type="string">
+  Comma-separated list of tags for the album.
+</ParamField>
+
+#### Examples
+
+```bash
+# Create album with name only
+dzdk photos album create --name "Community Events 2026"
+
+# Create album with description and tags
+dzdk photos album create --name "Portraits" --description "Community member portraits" --tags "people,portraits,community"
+```
+
+#### Output
+
+Displays album creation success with:
+- Album ID
+- Album name
+- Description
+- Tags
+
+---
+
+### dzdk photos album add
+
+Add photos to an existing album.
+
+```bash
+dzdk photos album add --album-id <id> --photo-ids <ids>
+```
+
+#### Options
+
+<ParamField path="--album-id" type="string" required>
+  Album ID to add photos to. This is a required parameter.
+</ParamField>
+
+<ParamField path="--photo-ids" type="string" required>
+  Comma-separated list of photo IDs to add to the album. This is a required parameter.
+</ParamField>
+
+#### Examples
+
+```bash
+# Add single photo to album
+dzdk photos album add --album-id album-123 --photo-ids photo-456
+
+# Add multiple photos to album
+dzdk photos album add --album-id album-123 --photo-ids "photo-456,photo-789,photo-012"
+```
+
+#### Output
+
+Displays progress bar while adding photos and confirmation message with the number of photos successfully added.
+
+---
+
+### dzdk photos album list
+
+List all photo albums.
+
+```bash
+dzdk photos album list
+```
+
+#### Output Format
+
+Displays a table with the following columns:
+- **Name**: Album name
+- **Description**: Album description
+- **Photos**: Number of photos in the album
+- **Tags**: Comma-separated list of album tags
+
+#### Examples
+
+```bash
+# List all albums
+dzdk photos album list
+```
+
+---
+
+## Pagination
+
+Photo list commands display 12 items per page. Use the `--page` flag to navigate:
+
+```bash
+# View page 1 (default)
+dzdk photos list
+
+# View page 2
+dzdk photos list --page 2
+
+# View page 3
+dzdk photos list --page 3
+```
+
+## Filtering and Sorting
+
+Combine multiple filters and sorting options:
+
+```bash
+# Filter by category and sort by title
+dzdk photos list --category portrait --sort-by title --sort-order asc
+
+# Search with pagination
+dzdk photos list --search community --page 2
+```
+
+## Notes
+
+- Photo uploads have a 10MB file size limit
+- Search is case-insensitive across multiple fields
+- Tags help organize and discover photos
+- Metadata includes both basic and technical information
+- Albums help organize related photos into collections
+- Progress bars show upload and batch operation status

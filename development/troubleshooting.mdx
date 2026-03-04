@@ -1,0 +1,702 @@
+---
+title: Troubleshooting
+description: Common issues and solutions for the Dzaleka Digital Heritage CLI
+---
+
+# Troubleshooting Guide
+
+This guide covers common issues you might encounter while developing or using the DZDK CLI, along with their solutions.
+
+## Installation Issues
+
+### Python Version Error
+
+**Problem:**
+```
+ERROR: Python version >= 3.8 required
+```
+
+**Solution:**
+
+1. Check your Python version:
+   ```bash
+   python --version
+   # or
+   python3 --version
+   ```
+
+2. Install Python 3.8 or higher:
+   - **macOS**: `brew install python@3.10`
+   - **Ubuntu/Debian**: `sudo apt install python3.10`
+   - **Windows**: Download from [python.org](https://www.python.org/downloads/)
+
+3. Use the correct Python version:
+   ```bash
+   python3.10 -m venv venv
+   ```
+
+### Virtual Environment Not Activating
+
+**Problem:**
+```
+command not found: activate
+```
+
+**Solution:**
+
+**On Linux/macOS:**
+```bash
+source venv/bin/activate
+```
+
+**On Windows (Command Prompt):**
+```cmd
+venv\Scripts\activate.bat
+```
+
+**On Windows (PowerShell):**
+```powershell
+venv\Scripts\Activate.ps1
+```
+
+If PowerShell shows an execution policy error:
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+### Dependency Installation Fails
+
+**Problem:**
+```
+ERROR: Could not install packages due to an EnvironmentError
+```
+
+**Solution:**
+
+1. Ensure you're in a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # or appropriate activate for your OS
+   ```
+
+2. Upgrade pip:
+   ```bash
+   pip install --upgrade pip
+   ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. If specific packages fail, try installing them individually:
+   ```bash
+   pip install click requests rich pyyaml pandas tabulate prompt-toolkit
+   ```
+
+### CLI Command Not Found After Installation
+
+**Problem:**
+```
+dzdk: command not found
+```
+
+**Solution:**
+
+1. Ensure the package is installed:
+   ```bash
+   pip install -e .
+   ```
+
+2. Verify the installation:
+   ```bash
+   pip list | grep dzdk
+   ```
+
+3. Check if the entry point is registered:
+   ```bash
+   python -c "import dzdk; print(dzdk.__file__)"
+   ```
+
+4. Try running directly:
+   ```bash
+   python -m dzdk
+   ```
+
+## API Connection Problems
+
+### Connection Refused Error
+
+**Problem:**
+```
+Connection refused - API server may not be running
+```
+
+**Cause:** The API server is not accessible.
+
+**Solution:**
+
+1. **Check API URL configuration:**
+   ```bash
+   dzdk show-config
+   ```
+
+2. **Verify the API URL is correct:**
+   ```bash
+   dzdk config --url "https://services.dzaleka.com/api"
+   ```
+
+3. **Test API connectivity manually:**
+   ```bash
+   curl https://services.dzaleka.com/api/services
+   ```
+
+4. **Check your internet connection:**
+   ```bash
+   ping services.dzaleka.com
+   ```
+
+5. **Check firewall settings** - Ensure outbound connections are allowed
+
+### Timeout Errors
+
+**Problem:**
+```
+Request Error: HTTPConnectionPool: Read timed out
+```
+
+**Solution:**
+
+1. **Increase timeout setting:**
+   ```bash
+   dzdk config --timeout 60
+   ```
+
+2. **Check network latency:**
+   ```bash
+   curl -w "\nTime: %{time_total}s\n" https://services.dzaleka.com/api/services
+   ```
+
+3. **Test with a longer timeout:**
+   ```bash
+   dzdk config --timeout 120
+   ```
+
+### SSL Certificate Errors
+
+**Problem:**
+```
+SSLError: [SSL: CERTIFICATE_VERIFY_FAILED]
+```
+
+**Solution:**
+
+1. **Update your CA certificates:**
+   - **macOS**: `brew install ca-certificates`
+   - **Ubuntu**: `sudo apt-get install ca-certificates`
+   - **Windows**: Update Windows or install certificates manually
+
+2. **Update certifi package:**
+   ```bash
+   pip install --upgrade certifi
+   ```
+
+3. **Check system time** - Incorrect system time can cause SSL errors
+
+### HTTP Error 404
+
+**Problem:**
+```
+HTTP Error: 404 Client Error: Not Found
+```
+
+**Solution:**
+
+1. **Verify API URL format:**
+   ```bash
+   dzdk show-config
+   ```
+   URL should be: `https://services.dzaleka.com/api`
+
+2. **Check endpoint availability:**
+   ```bash
+   dzdk health
+   ```
+
+3. **Verify resource ID** when accessing specific items:
+   ```bash
+   dzdk services list  # Get valid IDs
+   dzdk services get --id <valid-id>
+   ```
+
+### HTTP Error 500/502/503
+
+**Problem:**
+```
+HTTP Error: 500 Internal Server Error
+```
+
+**Solution:**
+
+1. **Check API health:**
+   ```bash
+   dzdk health
+   ```
+
+2. **Wait and retry** - Server may be temporarily unavailable
+
+3. **Contact support** if the issue persists:
+   - Email: contact@mail.dzaleka.com
+   - Check status page at services.dzaleka.com
+
+## Configuration Issues
+
+### Config File Not Found
+
+**Problem:**
+```
+Configuration file not found
+```
+
+**Solution:**
+
+1. **Check config location:**
+   ```bash
+   ls ~/.config/dzdk/config.yaml
+   # or
+   echo $DZDK_CONFIG_DIR
+   ```
+
+2. **Recreate config file:**
+   ```bash
+   dzdk config --url "https://services.dzaleka.com/api" --timeout 30
+   ```
+
+3. **Verify config permissions:**
+   ```bash
+   chmod 644 ~/.config/dzdk/config.yaml
+   ```
+
+### Invalid YAML Configuration
+
+**Problem:**
+```
+Error: Invalid YAML in configuration file
+```
+
+**Solution:**
+
+1. **View current config:**
+   ```bash
+   cat ~/.config/dzdk/config.yaml
+   ```
+
+2. **Backup and recreate:**
+   ```bash
+   mv ~/.config/dzdk/config.yaml ~/.config/dzdk/config.yaml.bak
+   dzdk config --url "https://services.dzaleka.com/api" --timeout 30
+   ```
+
+3. **Valid config format:**
+   ```yaml
+   api_url: https://services.dzaleka.com/api
+   timeout: 30
+   ```
+
+### Configuration Not Persisting
+
+**Problem:** Configuration changes don't persist after restart.
+
+**Solution:**
+
+1. **Check file permissions:**
+   ```bash
+   ls -la ~/.config/dzdk/
+   ```
+
+2. **Ensure config directory is writable:**
+   ```bash
+   chmod 755 ~/.config/dzdk/
+   chmod 644 ~/.config/dzdk/config.yaml
+   ```
+
+3. **Check for environment variable override:**
+   ```bash
+   env | grep DZDK
+   ```
+
+## Permission Errors
+
+### Config Directory Permission Denied
+
+**Problem:**
+```
+PermissionError: [Errno 13] Permission denied: '/home/user/.config/dzdk'
+```
+
+**Solution:**
+
+1. **Fix directory permissions:**
+   ```bash
+   sudo chown -R $USER:$USER ~/.config/dzdk
+   chmod 755 ~/.config/dzdk
+   ```
+
+2. **Use custom config location:**
+   ```bash
+   export DZDK_CONFIG_DIR=~/my-dzdk-config
+   dzdk config --url "https://services.dzaleka.com/api"
+   ```
+
+### File Upload Permission Error
+
+**Problem:**
+```
+PermissionError: Cannot read file
+```
+
+**Solution:**
+
+1. **Check file permissions:**
+   ```bash
+   ls -l /path/to/file.jpg
+   ```
+
+2. **Make file readable:**
+   ```bash
+   chmod 644 /path/to/file.jpg
+   ```
+
+3. **Verify file exists and path is correct:**
+   ```bash
+   file /path/to/file.jpg
+   ```
+
+## Testing Issues
+
+### Tests Failing Locally
+
+**Problem:** Tests pass in CI but fail locally.
+
+**Solution:**
+
+1. **Ensure clean environment:**
+   ```bash
+   deactivate  # Exit current venv
+   rm -rf venv
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   pip install -r requirements-dev.txt
+   pip install -e .
+   ```
+
+2. **Run tests with verbose output:**
+   ```bash
+   pytest -vv
+   ```
+
+3. **Check for environment-specific issues:**
+   ```bash
+   pytest -vv --tb=long
+   ```
+
+### Import Errors in Tests
+
+**Problem:**
+```
+ModuleNotFoundError: No module named 'dzdk'
+```
+
+**Solution:**
+
+1. **Install package in editable mode:**
+   ```bash
+   pip install -e .
+   ```
+
+2. **Verify installation:**
+   ```bash
+   python -c "import dzdk; print(dzdk.__file__)"
+   ```
+
+3. **Check PYTHONPATH:**
+   ```bash
+   export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+   ```
+
+### Mock Not Working as Expected
+
+**Problem:** Mocks are not intercepting calls.
+
+**Solution:**
+
+1. **Patch at the correct location:**
+   ```python
+   # Wrong: patching where it's defined
+   @patch('requests.get')
+   
+   # Correct: patching where it's used
+   @patch('dzdk.requests.get')
+   ```
+
+2. **Use correct import path:**
+   ```python
+   # If dzdk.py imports: from requests import get
+   @patch('dzdk.get')
+   
+   # If dzdk.py imports: import requests
+   @patch('dzdk.requests.get')
+   ```
+
+3. **Ensure patch order matches parameter order:**
+   ```python
+   @patch('module.second')
+   @patch('module.first')
+   def test_example(first_mock, second_mock):
+       # Parameters are in reverse order of decorators
+       pass
+   ```
+
+## Development Issues
+
+### Code Formatting Errors
+
+**Problem:**
+```
+black: reformatted file.py
+```
+
+**Solution:**
+
+1. **Run Black to auto-format:**
+   ```bash
+   black dzdk.py tests/
+   ```
+
+2. **Check formatting without changes:**
+   ```bash
+   black --check dzdk.py
+   ```
+
+3. **Set up pre-commit hook** to auto-format:
+   ```bash
+   pip install pre-commit
+   pre-commit install
+   ```
+
+### Linting Errors
+
+**Problem:**
+```
+flake8: E501 line too long
+```
+
+**Solution:**
+
+1. **Run flake8 to see all issues:**
+   ```bash
+   flake8 dzdk.py
+   ```
+
+2. **Common fixes:**
+   - **E501 (line too long)**: Break long lines
+   - **F401 (unused import)**: Remove unused imports
+   - **E302 (expected 2 blank lines)**: Add blank lines
+
+3. **Configure flake8** in `.flake8` or `setup.cfg`:
+   ```ini
+   [flake8]
+   max-line-length = 100
+   exclude = venv,.git,__pycache__
+   ignore = E203,W503
+   ```
+
+### Type Checking Errors
+
+**Problem:**
+```
+mypy: error: Argument has incompatible type
+```
+
+**Solution:**
+
+1. **Run mypy to see all type issues:**
+   ```bash
+   mypy dzdk.py
+   ```
+
+2. **Add type hints:**
+   ```python
+   # Before
+   def process_data(data):
+       return data
+   
+   # After
+   def process_data(data: Dict[str, Any]) -> Dict[str, Any]:
+       return data
+   ```
+
+3. **Use `Optional` for nullable types:**
+   ```python
+   from typing import Optional
+   
+   def get_value(key: str) -> Optional[str]:
+       return data.get(key)  # May return None
+   ```
+
+## Common Error Messages
+
+### "Endpoint returned HTML instead of JSON"
+
+**Cause:** API endpoint returned a web page instead of JSON data.
+
+**Solution:**
+
+1. Verify the correct API endpoint
+2. Check if API requires authentication
+3. Ensure base URL ends with `/api`
+4. Check API documentation for correct endpoint paths
+
+### "File size exceeds 10MB limit"
+
+**Cause:** Attempting to upload a file larger than 10MB.
+
+**Solution:**
+
+1. **Compress the image:**
+   ```bash
+   # Using imagemagick
+   convert large.jpg -quality 85 compressed.jpg
+   ```
+
+2. **Resize the image:**
+   ```bash
+   convert large.jpg -resize 1920x1080 resized.jpg
+   ```
+
+3. **Check file size:**
+   ```bash
+   ls -lh file.jpg
+   du -h file.jpg
+   ```
+
+### "No services match the specified filters"
+
+**Cause:** Search or filter criteria are too restrictive.
+
+**Solution:**
+
+1. **Try broader search:**
+   ```bash
+   # Instead of:
+   dzdk services list --search "exact phrase" --category "medical"
+   
+   # Try:
+   dzdk services list --search "health"
+   ```
+
+2. **List all services first:**
+   ```bash
+   dzdk services list
+   ```
+
+3. **Check available categories:**
+   ```bash
+   dzdk services list | grep Category
+   ```
+
+## Error Handling Patterns in Source
+
+When debugging or adding new features, reference these error handling patterns from `dzdk.py`:
+
+### API Request Error Handling
+
+```python
+try:
+    response = requests.get(url, timeout=TIMEOUT)
+    response.raise_for_status()
+    return response.json()
+except requests.exceptions.HTTPError as e:
+    console.print(f"[red]HTTP Error: {str(e)}[/red]")
+    sys.exit(1)
+except requests.exceptions.RequestException as e:
+    console.print(f"[red]Request Error: {str(e)}[/red]")
+    sys.exit(1)
+except json.JSONDecodeError:
+    console.print("[red]Invalid JSON response[/red]")
+    sys.exit(1)
+```
+
+### File Operation Error Handling
+
+```python
+try:
+    if not os.path.exists(file):
+        console.print(f"[red]File not found: {file}[/red]")
+        sys.exit(1)
+    
+    file_size = os.path.getsize(file)
+    if file_size > 10 * 1024 * 1024:  # 10MB limit
+        console.print("[red]File size exceeds 10MB limit[/red]")
+        sys.exit(1)
+        
+    with open(file, 'rb') as f:
+        # Process file
+        pass
+except Exception as e:
+    console.print(f"[red]Error: {str(e)}[/red]")
+    sys.exit(1)
+```
+
+### Configuration Error Handling
+
+```python
+try:
+    with open(CONFIG_FILE) as f:
+        config = yaml.safe_load(f)
+    return config
+except yaml.YAMLError as e:
+    console.print(f"[red]Invalid YAML: {str(e)}[/red]")
+    sys.exit(1)
+except FileNotFoundError:
+    # Create default config
+    return DEFAULT_CONFIG
+```
+
+## Getting Additional Help
+
+If you're still experiencing issues:
+
+### 1. Check the Logs
+
+Enable verbose output:
+```bash
+dzdk --verbose health  # If implemented
+```
+
+### 2. Search Existing Issues
+
+Check [GitHub Issues](https://github.com/Dzaleka-Connect/dzdk-cli/issues) for similar problems.
+
+### 3. Create a Bug Report
+
+If you found a bug, create an issue with:
+- DZDK CLI version: `dzdk --version`
+- Python version: `python --version`
+- Operating system
+- Full error message and traceback
+- Steps to reproduce
+- Expected vs actual behavior
+
+### 4. Contact Support
+
+- **Email**: contact@mail.dzaleka.com
+- **Website**: https://services.dzaleka.com
+- **GitHub**: https://github.com/Dzaleka-Connect/dzdk-cli
+
+### 5. Community Resources
+
+- Documentation: [DZDK CLI Docs](https://services.dzaleka.com/docs/dzdk-cli)
+- Contributing Guide: [/development/contributing](/development/contributing)
+- Testing Guide: [/development/testing](/development/testing)

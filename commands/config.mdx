@@ -1,0 +1,148 @@
+---
+title: dzdk config
+description: Configure CLI settings for the Dzaleka Digital Heritage API
+---
+
+## Command Syntax
+
+```bash
+dzdk config [OPTIONS]
+```
+
+Configure CLI settings including API URL and request timeout. You can update settings individually using flags or use interactive mode for a guided configuration experience.
+
+## Options
+
+<ParamField path="--url" type="string">
+  API base URL for the Dzaleka Digital Heritage API.
+  
+  The CLI automatically appends `/api` to the URL if not present. The URL should point to your API server (e.g., `https://services.dzaleka.com`).
+  
+  **Default:** `https://services.dzaleka.com/api`
+</ParamField>
+
+<ParamField path="--timeout" type="integer">
+  Request timeout in seconds for all API calls.
+  
+  This sets how long the CLI will wait for API responses before timing out.
+  
+  **Default:** `30`
+</ParamField>
+
+<ParamField path="--interactive" type="flag">
+  Start interactive configuration mode.
+  
+  When enabled, the CLI prompts you for each configuration value, showing current settings and allowing you to update them interactively.
+</ParamField>
+
+## Configuration File
+
+The configuration is stored in a YAML file at:
+
+```
+~/.config/dzdk/config.yaml
+```
+
+You can set a custom location using the `DZDK_CONFIG_DIR` environment variable:
+
+```bash
+export DZDK_CONFIG_DIR="/path/to/config"
+```
+
+## Default Configuration
+
+When you first run the CLI, it creates a default configuration:
+
+```yaml
+api_url: https://services.dzaleka.com/api
+timeout: 30
+```
+
+## Usage Examples
+
+### Update API URL
+
+```bash
+dzdk config --url "https://api.example.com"
+```
+
+**Output:**
+```
+Configuration updated successfully
+API URL: https://api.example.com/api
+Timeout: 30 seconds
+```
+
+### Update Timeout
+
+```bash
+dzdk config --timeout 60
+```
+
+**Output:**
+```
+Configuration updated successfully
+API URL: https://services.dzaleka.com/api
+Timeout: 60 seconds
+```
+
+### Update Multiple Settings
+
+```bash
+dzdk config --url "https://services.dzaleka.com" --timeout 45
+```
+
+**Output:**
+```
+Configuration updated successfully
+API URL: https://services.dzaleka.com/api
+Timeout: 45 seconds
+```
+
+### Interactive Configuration
+
+```bash
+dzdk config --interactive
+```
+
+**Output:**
+```
+┌──────────────────────────────────────────────────────────────┐
+│                Interactive Configuration                     │
+│                Configure your CLI settings                   │
+└──────────────────────────────────────────────────────────────┘
+
+┌─ Current Configuration ──────────────────────────────────────┐
+│ API URL: https://services.dzaleka.com/api                    │
+│ Timeout: 30 seconds                                          │
+└──────────────────────────────────────────────────────────────┘
+
+Enter API URL [https://services.dzaleka.com/api]: https://api.example.com
+Enter timeout in seconds [30]: 60
+
+┌─ Configuration Updated ──────────────────────────────────────┐
+│ Configuration has been updated successfully!                 │
+│                                                              │
+│ New Settings:                                                │
+│ API URL: https://api.example.com/api                         │
+│ Timeout: 60 seconds                                          │
+└──────────────────────────────────────────────────────────────┘
+```
+
+## URL Formatting
+
+The CLI automatically normalizes URLs:
+
+- Adds `https://` if no protocol is specified
+- Appends `/api` if not already present
+- Removes trailing slashes before adding `/api`
+
+**Examples:**
+- `services.dzaleka.com` → `https://services.dzaleka.com/api`
+- `https://services.dzaleka.com/` → `https://services.dzaleka.com/api`
+- `https://services.dzaleka.com/api` → `https://services.dzaleka.com/api` (unchanged)
+
+## Related Commands
+
+- `dzdk show-config` - Display current configuration settings (documented on this page)
+- [dzdk health](/commands/health) - Check API health using configured settings

@@ -1,0 +1,459 @@
+---
+title: Configuration
+description: Complete guide to configuring the Dzaleka Digital Heritage CLI
+---
+
+## Configuration overview
+
+DZDK stores its configuration in a YAML file located at:
+
+- **Linux/macOS**: `~/.config/dzdk/config.yaml`
+- **Windows**: `%USERPROFILE%\.config\dzdk\config.yaml`
+
+The configuration file is automatically created with default values on first run.
+
+## Default configuration
+
+When DZDK is first installed, it creates a configuration file with these defaults:
+
+```yaml
+api_url: https://services.dzaleka.com/api
+timeout: 30
+```
+
+## Configuration options
+
+### API URL
+
+The base URL for the Dzaleka Digital Heritage API.
+
+- **Key**: `api_url`
+- **Type**: String
+- **Default**: `https://services.dzaleka.com/api`
+- **Example**: `https://services.dzaleka.com/api`
+
+<Info>
+The API URL is automatically formatted to ensure it starts with `https://` and ends with `/api`.
+</Info>
+
+### Request timeout
+
+Maximum time (in seconds) to wait for API responses before timing out.
+
+- **Key**: `timeout`
+- **Type**: Integer
+- **Default**: `30`
+- **Range**: 1-300 seconds
+- **Example**: `30`
+
+<Warning>
+Setting a very low timeout (< 5 seconds) may cause requests to fail on slower connections.
+</Warning>
+
+## Viewing configuration
+
+### Show current settings
+
+Display your current DZDK configuration:
+
+```bash
+dzdk show-config
+```
+
+This command displays:
+
+```
+╭─────────────────────────────────────────╮
+│ Current Configuration                   │
+│ Your CLI settings                       │
+╰─────────────────────────────────────────╯
+
+╭─────────────────────────────────────────╮
+│ Configuration Details                   │
+├─────────────────────────────────────────┤
+│   API Settings                          │
+│   URL: https://services.dzaleka.com/api │
+│   Timeout: 30 seconds                   │
+│                                         │
+│   Configuration File                    │
+│   Location: /home/user/.config/dzdk/config.yaml
+│   Last Modified: 2024-03-20 14:30:15   │
+╰─────────────────────────────────────────╯
+```
+
+<Note>
+You can also use `dzdk show_config` (with underscore) as an alias.
+</Note>
+
+## Updating configuration
+
+### Interactive mode
+
+Use interactive mode for a guided configuration experience:
+
+```bash
+dzdk config --interactive
+```
+
+This will:
+1. Show your current configuration
+2. Prompt you for the API URL (with current value as default)
+3. Prompt you for the timeout (with current value as default)
+4. Save the updated configuration
+5. Display a confirmation message
+
+Example session:
+
+```
+╭─────────────────────────────────────────╮
+│ Interactive Configuration               │
+│ Configure your CLI settings             │
+╰─────────────────────────────────────────╯
+
+╭─────────────────────────────────────────╮
+│ Current Configuration                   │
+├─────────────────────────────────────────┤
+│ API URL: https://services.dzaleka.com/api
+│ Timeout: 30 seconds                     │
+╰─────────────────────────────────────────╯
+
+Enter API URL [https://services.dzaleka.com/api]: https://api.example.com
+Enter timeout in seconds [30]: 60
+
+╭─────────────────────────────────────────╮
+│ Configuration Updated                   │
+├─────────────────────────────────────────┤
+│ Configuration has been updated successfully!
+│                                         │
+│ New Settings:                           │
+│ API URL: https://api.example.com/api    │
+│ Timeout: 60 seconds                     │
+╰─────────────────────────────────────────╯
+```
+
+### Command-line options
+
+Update specific settings using command-line flags:
+
+<CodeGroup>
+```bash Set API URL
+dzdk config --url "https://services.dzaleka.com/api"
+```
+
+```bash Set timeout
+dzdk config --timeout 60
+```
+
+```bash Set both
+dzdk config --url "https://services.dzaleka.com/api" --timeout 45
+```
+</CodeGroup>
+
+<Tip>
+When setting the API URL via command line, DZDK automatically ensures it ends with `/api`.
+</Tip>
+
+### Manual editing
+
+You can also edit the configuration file directly:
+
+<Steps>
+  <Step title="Locate the config file">
+    ```bash
+    # Linux/macOS
+    nano ~/.config/dzdk/config.yaml
+    
+    # Windows
+    notepad %USERPROFILE%\.config\dzdk\config.yaml
+    ```
+  </Step>
+
+  <Step title="Edit the values">
+    ```yaml
+    api_url: https://services.dzaleka.com/api
+    timeout: 30
+    ```
+  </Step>
+
+  <Step title="Save and verify">
+    ```bash
+    dzdk show-config
+    ```
+  </Step>
+</Steps>
+
+## Environment variables
+
+### Custom config directory
+
+Override the default configuration directory location:
+
+```bash
+export DZDK_CONFIG_DIR="/path/to/custom/config"
+```
+
+Example:
+
+```bash
+# Set custom directory
+export DZDK_CONFIG_DIR="$HOME/my-dzdk-config"
+
+# DZDK will now use this directory
+dzdk show-config
+```
+
+<Info>
+The config file will be created at `$DZDK_CONFIG_DIR/config.yaml`.
+</Info>
+
+### Persistent environment variable
+
+Make the environment variable permanent:
+
+<CodeGroup>
+```bash Linux/macOS (bash)
+# Add to ~/.bashrc or ~/.bash_profile
+echo 'export DZDK_CONFIG_DIR="$HOME/my-dzdk-config"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+```bash Linux/macOS (zsh)
+# Add to ~/.zshrc
+echo 'export DZDK_CONFIG_DIR="$HOME/my-dzdk-config"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+```powershell Windows (PowerShell)
+# Add to your PowerShell profile
+[Environment]::SetEnvironmentVariable(
+    "DZDK_CONFIG_DIR",
+    "$HOME\my-dzdk-config",
+    "User"
+)
+```
+</CodeGroup>
+
+## Configuration file structure
+
+The configuration file uses YAML format. Here's the complete structure:
+
+```yaml config.yaml
+# API Configuration
+api_url: https://services.dzaleka.com/api  # Base API URL
+timeout: 30                                 # Request timeout in seconds
+```
+
+### API URL formatting rules
+
+DZDK automatically normalizes the API URL:
+
+1. Ensures it starts with `https://` (adds if missing)
+2. Ensures it ends with `/api` (appends if missing)
+3. Removes trailing slashes before adding `/api`
+
+Examples of automatic formatting:
+
+| Input | Normalized Output |
+|-------|------------------|
+| `services.dzaleka.com` | `https://services.dzaleka.com/api` |
+| `https://services.dzaleka.com` | `https://services.dzaleka.com/api` |
+| `https://services.dzaleka.com/` | `https://services.dzaleka.com/api` |
+| `https://services.dzaleka.com/api` | `https://services.dzaleka.com/api` |
+| `https://services.dzaleka.com/api/` | `https://services.dzaleka.com/api` |
+
+## Configuration validation
+
+DZDK automatically validates configuration values:
+
+### API URL validation
+
+- Must be a valid URL format
+- Automatically adds `https://` if protocol is missing
+- Automatically adds `/api` suffix if missing
+
+### Timeout validation
+
+- Must be a positive integer
+- Recommended range: 5-300 seconds
+- Default is 30 seconds if invalid value provided
+
+## Testing configuration
+
+After updating your configuration, verify it works:
+
+```bash
+# Check API connectivity
+dzdk health
+```
+
+This command will:
+1. Use your configured API URL
+2. Apply your configured timeout
+3. Test all API endpoints
+4. Display response times and status
+
+Successful output:
+
+```
+╭─────────────────────────────────────────╮
+│ API Health Check                        │
+│ Monitoring all endpoints                │
+╰─────────────────────────────────────────╯
+
+┌────────────┬────────┬───────────────┬─────────┐
+│ Endpoint   │ Status │ Response Time │ Details │
+├────────────┼────────┼───────────────┼─────────┤
+│ services   │   ✓    │ 0.23s         │ OK      │
+│ events     │   ✓    │ 0.18s         │ OK      │
+│ photos     │   ✓    │ 0.21s         │ OK      │
+│ population │   ✓    │ 0.19s         │ OK      │
+│ resources  │   ✓    │ 0.24s         │ OK      │
+└────────────┴────────┴───────────────┴─────────┘
+
+✓ All endpoints are healthy
+```
+
+## Troubleshooting
+
+### Configuration file not found
+
+If the configuration file doesn't exist:
+
+```bash
+# Run any DZDK command to auto-create it
+dzdk show-config
+```
+
+DZDK will automatically create the configuration directory and file with default values.
+
+### Invalid configuration values
+
+If you manually edit the config file and introduce errors:
+
+```bash
+# Reset to defaults
+rm ~/.config/dzdk/config.yaml  # Linux/macOS
+dzdk show-config  # Recreates with defaults
+```
+
+### Connection failures
+
+If the health check fails after configuration:
+
+<Steps>
+  <Step title="Verify API URL">
+    ```bash
+    dzdk show-config
+    ```
+    
+    Ensure the API URL is correct.
+  </Step>
+
+  <Step title="Test connectivity">
+    ```bash
+    curl https://services.dzaleka.com/api/health
+    ```
+    
+    Verify you can reach the API directly.
+  </Step>
+
+  <Step title="Increase timeout">
+    ```bash
+    dzdk config --timeout 60
+    ```
+    
+    Try a longer timeout for slow connections.
+  </Step>
+
+  <Step title="Check network">
+    Ensure you have internet connectivity and the API server is running.
+  </Step>
+</Steps>
+
+### Permission errors
+
+If you get permission errors accessing the config file:
+
+```bash
+# Fix permissions (Linux/macOS)
+chmod 600 ~/.config/dzdk/config.yaml
+
+# Or recreate the config directory
+rm -rf ~/.config/dzdk
+dzdk show-config
+```
+
+## Advanced configuration
+
+### Multiple environments
+
+Manage different configurations for different environments:
+
+```bash
+# Production config
+export DZDK_CONFIG_DIR="$HOME/.config/dzdk-prod"
+dzdk config --url "https://services.dzaleka.com/api"
+
+# Development config
+export DZDK_CONFIG_DIR="$HOME/.config/dzdk-dev"
+dzdk config --url "http://localhost:8000/api"
+
+# Switch between them as needed
+export DZDK_CONFIG_DIR="$HOME/.config/dzdk-prod"
+dzdk health
+```
+
+### Shell aliases
+
+Create aliases for different environments:
+
+```bash ~/.bashrc or ~/.zshrc
+# Add to your shell configuration file
+alias dzdk-prod='DZDK_CONFIG_DIR="$HOME/.config/dzdk-prod" dzdk'
+alias dzdk-dev='DZDK_CONFIG_DIR="$HOME/.config/dzdk-dev" dzdk'
+
+# Usage
+dzdk-prod health
+dzdk-dev health
+```
+
+### Backup and restore
+
+Backup your configuration:
+
+```bash
+# Backup
+cp ~/.config/dzdk/config.yaml ~/dzdk-config-backup.yaml
+
+# Restore
+cp ~/dzdk-config-backup.yaml ~/.config/dzdk/config.yaml
+```
+
+## Configuration best practices
+
+<Tip>
+**Keep timeouts reasonable**: Set timeout between 10-60 seconds. Too short causes failures, too long causes hanging.
+</Tip>
+
+<Tip>
+**Use environment variables for CI/CD**: In automated environments, use `DZDK_CONFIG_DIR` to avoid conflicts.
+</Tip>
+
+<Tip>
+**Version control**: If managing multiple configurations, keep them in version control but exclude sensitive data.
+</Tip>
+
+<Warning>
+**Security**: The configuration file doesn't currently store credentials, but if extended in the future, ensure proper file permissions (600 on Unix systems).
+</Warning>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quick start" icon="rocket" href="/quickstart">
+    Start using DZDK with common workflows
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference">
+    Explore all available commands
+  </Card>
+</CardGroup>

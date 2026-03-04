@@ -1,0 +1,397 @@
+---
+title: dzdk shell
+description: Start interactive shell mode with command history and auto-completion
+---
+
+Launch an interactive shell environment for the Dzaleka Digital Heritage CLI with enhanced features like command history, auto-completion, and persistent sessions.
+
+## Syntax
+
+```bash
+dzdk shell
+```
+
+## Description
+
+The interactive shell provides a dedicated environment for running multiple commands without repeatedly typing `dzdk`. It includes advanced features to improve productivity and user experience.
+
+## Features
+
+### Command History
+- All commands are saved to history file
+- History persists across sessions
+- Navigate history with up/down arrows
+- History file location: `~/.dzdk/history`
+
+### Auto-Completion
+- Tab completion for all commands
+- Supports multi-word commands
+- Context-aware suggestions
+- Command category grouping
+
+### Auto-Suggest
+- Suggestions from command history
+- Gray text showing previous similar commands
+- Accept suggestions with right arrow key
+
+### Session Management
+- Persistent shell session
+- Command output captured and formatted
+- Graceful error handling
+- Clean exit with Ctrl+C or `exit` command
+
+## Starting the Shell
+
+```bash
+dzdk shell
+```
+
+**Welcome Screen:**
+```
+╭─────────────────────────────────────────────────────────────────────────╮
+│                                                                         │
+│  Welcome to Dzaleka Digital Heritage CLI Shell                          │
+│  Type 'help' or '?' to list commands                                    │
+│                                                                         │
+╰─────────────────────────────────────────────────────────────────────────╯
+
+dzdk> 
+```
+
+## Shell Commands
+
+### help
+
+Show available commands and categories.
+
+```bash
+dzdk> help
+```
+
+**With Command Name:**
+```bash
+dzdk> help services
+```
+
+Displays detailed help for the specified command.
+
+### clear
+
+Clear the terminal screen and redisplay the welcome message.
+
+```bash
+dzdk> clear
+```
+
+### exit
+
+Exit the interactive shell.
+
+```bash
+dzdk> exit
+```
+
+**Alternative:**
+- Press `Ctrl+C` to interrupt and exit
+- Press `Ctrl+D` for EOF exit
+
+## Available Command Categories
+
+The shell organizes commands into categories:
+
+### Health
+- `health` - Check API health status
+
+### Services
+- `services list` - List all services
+- `services get` - Get service details
+
+### Events
+- `events list` - List all events
+- `events get` - Get event details
+
+### Photos
+- `photos list` - List photos
+- `photos get` - Get photo details
+- `photos upload` - Upload new photo
+- `photos metadata` - View metadata
+- `photos edit` - Edit photo details
+- `photos album create` - Create album
+- `photos album add` - Add to album
+- `photos album list` - List albums
+
+### Population
+- `population stats` - View statistics
+- `population get` - Get demographics
+
+### Resources
+- `resources list` - List resources
+- `resources get` - Get resource details
+- `resources fetch` - Download resource
+
+### Search
+- `search` - Search across all resources
+
+### Batch
+- `batch download` - Download multiple files
+- `batch upload` - Upload multiple files
+
+### Export
+- `export csv` - Export to CSV
+- `export report` - Generate report
+
+### Config
+- `config` - Configure CLI settings
+
+## Usage Examples
+
+### Basic Command Execution
+
+```bash
+dzdk> health
+API Status: Healthy
+Version: 1.0.0
+
+dzdk> services list
+[Services listing displayed]
+
+dzdk> search --query education
+[Search results displayed]
+```
+
+### Using Command History
+
+```bash
+dzdk> services list --category healthcare
+[Results displayed]
+
+# Press UP arrow to recall
+dzdk> services list --category healthcare
+
+# Edit and modify
+dzdk> services list --category education
+```
+
+### Tab Completion
+
+```bash
+dzdk> ser[TAB]
+# Completes to:
+dzdk> services 
+
+dzdk> photos al[TAB]
+# Shows completions:
+photos album create    photos album add    photos album list
+```
+
+### Multi-Command Session
+
+```bash
+dzdk> services list
+# View services
+
+dzdk> services get healthcare-center
+# Get details
+
+dzdk> events list --filter upcoming
+# Check events
+
+dzdk> export csv --type services --output services.csv
+# Export data
+
+dzdk> exit
+Thank you for using Dzaleka Digital Heritage CLI!
+```
+
+## Command Execution
+
+### Command Parsing
+
+Commands are executed as if run with `dzdk` prefix:
+
+```bash
+# In shell:
+dzdk> services list
+
+# Equivalent to:
+dzdk services list
+```
+
+### Options and Arguments
+
+All options work the same as in regular CLI:
+
+```bash
+dzdk> search --query "education" --type services --limit 5
+dzdk> photos upload --file image.jpg --title "Community Event"
+dzdk> batch download --type photos --ids "p1,p2,p3"
+```
+
+### Error Handling
+
+Errors are displayed without exiting the shell:
+
+```bash
+dzdk> services get invalid-id
+Error: Service not found
+
+dzdk> # Shell continues running
+```
+
+## History Management
+
+### History File
+
+Commands are automatically saved to:
+```
+~/.dzdk/history
+```
+
+### History Navigation
+
+- **Up Arrow**: Previous command
+- **Down Arrow**: Next command
+- **Ctrl+R**: Reverse search history
+- **Ctrl+S**: Forward search history
+
+### Auto-Suggestions
+
+As you type, the shell suggests commands from history:
+
+```bash
+dzdk> ser
+      services list --category healthcare  # Gray suggestion text
+```
+
+Press **Right Arrow** to accept the suggestion.
+
+## Prompt Customization
+
+The shell uses a simple prompt:
+
+```bash
+dzdk> 
+```
+
+This indicates you're in the interactive shell environment.
+
+## Exiting the Shell
+
+### Normal Exit
+
+```bash
+dzdk> exit
+Thank you for using Dzaleka Digital Heritage CLI!
+```
+
+### Keyboard Interrupt
+
+```bash
+dzdk> [Ctrl+C]
+Goodbye!
+```
+
+### Error Exit
+
+If the shell encounters a critical error:
+
+```bash
+Error starting shell: [error message]
+```
+
+## Advanced Features
+
+### Session Persistence
+
+- Command history persists between sessions
+- Configuration settings are maintained
+- Shell state is saved on clean exit
+
+### Output Capture
+
+- All command output is properly formatted
+- Rich console formatting preserved
+- Progress bars and spinners work correctly
+
+### Command Aliases
+
+The shell recognizes all standard CLI commands without the `dzdk` prefix.
+
+## Shell-Specific Help
+
+View help within the shell:
+
+```bash
+dzdk> help
+
+Available Commands
+
+Health
+  • health
+
+Services
+  • services list
+  • services get
+
+[...]
+
+Shell Commands
+  • help [command] - Show help for a specific command
+  • clear - Clear the terminal screen
+  • exit - Exit the shell
+```
+
+## Technical Details
+
+### Implementation
+
+- Built on Python's `cmd` module
+- Uses `prompt_toolkit` for enhanced features
+- Integrates with Click command framework
+- Rich console for formatted output
+
+### File Locations
+
+```
+~/.dzdk/
+  └── history        # Command history file
+```
+
+### Completion Data
+
+Command completions are automatically generated from all registered CLI commands and organized by category.
+
+## Tips
+
+1. **Use tab completion** to discover available commands
+2. **Navigate history** with arrow keys for efficiency
+3. **Use help** command to explore features
+4. **Chain operations** - run multiple commands in one session
+5. **Clear screen** when output gets cluttered
+
+## Limitations
+
+- No command piping or redirection within shell
+- No command aliases (use full command names)
+- No background job execution
+- No variable expansion or scripting
+
+## Error Messages
+
+**Shell Start Error:**
+```bash
+Error starting shell: [error message]
+```
+
+**Command Execution Error:**
+```bash
+Error executing command: [error message]
+```
+
+## Notes
+
+- Shell is designed for interactive use only
+- Not suitable for scripting (use regular CLI for scripts)
+- History file grows over time (manual cleanup may be needed)
+- Exit cleanly to ensure history is saved
+- All regular CLI commands work in shell mode

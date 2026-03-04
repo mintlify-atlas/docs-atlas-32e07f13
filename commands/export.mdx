@@ -1,0 +1,299 @@
+---
+title: dzdk export
+description: Export data to various formats including CSV and markdown reports
+---
+
+Export platform data to external formats for analysis, reporting, or archiving purposes.
+
+## Subcommands
+
+- `dzdk export csv` - Export data to CSV format
+- `dzdk export report` - Generate detailed markdown reports
+
+## dzdk export csv
+
+Export data to CSV (Comma-Separated Values) format for use in spreadsheet applications or data analysis tools.
+
+### Syntax
+
+```bash
+dzdk export csv --type <data_type> --output <file_path>
+```
+
+### Options
+
+<ParamField path="--type" type="choice" required>
+  Type of data to export
+  
+  **Choices:** `services`, `events`, `photos`, `resources`, `population`
+</ParamField>
+
+<ParamField path="--output" type="path" required>
+  Output file path for the CSV file
+  
+  File will be created or overwritten if it exists
+</ParamField>
+
+### Examples
+
+#### Export Services to CSV
+
+```bash
+dzdk export csv --type services --output services.csv
+```
+
+#### Export Events with Full Path
+
+```bash
+dzdk export csv --type events --output ~/Documents/events_export.csv
+```
+
+#### Export Population Data
+
+```bash
+dzdk export csv --type population --output population_stats.csv
+```
+
+#### Export Photos Metadata
+
+```bash
+dzdk export csv --type photos --output photo_catalog.csv
+```
+
+#### Export Resources
+
+```bash
+dzdk export csv --type resources --output resources_inventory.csv
+```
+
+### CSV Structure
+
+The CSV export automatically:
+- Flattens nested data structures
+- Converts nested objects to prefixed columns (e.g., `contact_email`, `contact_phone`)
+- Joins array values with commas
+- Includes all available fields for the data type
+- Adds header row with column names
+
+### Field Flattening Examples
+
+**Nested Object:**
+```json
+{
+  "contact": {
+    "email": "service@example.com",
+    "phone": "123-456-7890"
+  }
+}
+```
+
+Becomes:
+```csv
+contact_email,contact_phone
+service@example.com,123-456-7890
+```
+
+**Array Values:**
+```json
+{
+  "tags": ["education", "community", "youth"]
+}
+```
+
+Becomes:
+```csv
+tags
+education, community, youth
+```
+
+### Data Fields by Type
+
+#### Services CSV
+- ID, title, description
+- Category, status
+- Contact information (flattened)
+- Location details (flattened)
+- Operating hours
+
+#### Events CSV
+- ID, title, description
+- Date, time
+- Location
+- Category
+- Organizer information
+
+#### Photos CSV
+- ID, title, description
+- URL, thumbnail URL
+- Photographer details (flattened)
+- Location
+- Tags (comma-separated)
+- Date taken
+
+#### Resources CSV
+- ID, title, description
+- Category, file type
+- Author
+- Download URL
+- File size
+
+#### Population CSV
+- Demographics data
+- Statistics by category
+- Time period information
+
+## dzdk export report
+
+Generate detailed reports in markdown format with comprehensive information about the data.
+
+### Syntax
+
+```bash
+dzdk export report --type <data_type> --output <file_path>
+```
+
+### Options
+
+<ParamField path="--type" type="choice" required>
+  Type of data to report
+  
+  **Choices:** `services`, `events`, `photos`, `resources`, `population`
+</ParamField>
+
+<ParamField path="--output" type="path" required>
+  Output file path for the markdown report
+  
+  File will be created or overwritten if it exists
+</ParamField>
+
+### Examples
+
+#### Generate Services Report
+
+```bash
+dzdk export report --type services --output services_report.md
+```
+
+#### Generate Events Report
+
+```bash
+dzdk export report --type events --output ~/Reports/events_2024.md
+```
+
+#### Generate Photo Catalog Report
+
+```bash
+dzdk export report --type photos --output photo_catalog.md
+```
+
+### Report Structure
+
+Each report includes:
+
+1. **Title**: Data type name
+2. **Generation Timestamp**: When the report was created
+3. **Summary Section**: Total item count
+4. **Details Section**: Individual item details
+
+### Item Details Format
+
+For each item:
+```markdown
+### [Item Title]
+
+- **field1**: value1
+- **field2**: value2
+
+#### Nested Section
+- **nested_field**: nested_value
+
+---
+```
+
+### Report Examples
+
+**Services Report:**
+```markdown
+# Services Report
+
+Generated on: 2024-01-15 14:30:00
+
+## Summary
+
+Total items: 25
+
+## Details
+
+### Community Health Center
+
+- **id**: srv-001
+- **description**: Primary healthcare services
+- **category**: Healthcare
+- **status**: active
+
+#### Contact
+- **email**: health@example.com
+- **phone**: 123-456-7890
+
+---
+```
+
+### Nested Data Handling
+
+- **Dictionaries**: Rendered as subsections with header
+- **Lists**: Joined with commas in a single line
+- **Strings/Numbers**: Displayed as key-value pairs
+
+## Output Location
+
+Both export commands display the final file path:
+```bash
+Data has been exported to: /full/path/to/file.csv
+```
+
+or
+```bash
+Report has been saved to: /full/path/to/report.md
+```
+
+## Error Handling
+
+**No Data Found:**
+```bash
+No data found to export
+```
+
+**API Fetch Failure:**
+```bash
+Failed to fetch data
+```
+
+**File Write Error:**
+```bash
+Error: [error details]
+```
+
+## Use Cases
+
+### CSV Export
+- Import into Excel or Google Sheets
+- Data analysis with Python/R
+- Database imports
+- Backup and archiving
+- Integration with other systems
+
+### Report Export
+- Documentation generation
+- Human-readable summaries
+- Content review and auditing
+- Offline reference material
+- Archival documentation
+
+## Notes
+
+- Both formats include all available data fields
+- Exports fetch live data from the API
+- Large datasets may take time to export
+- Existing files are overwritten without warning
+- CSV files use UTF-8 encoding
+- Reports use standard markdown formatting

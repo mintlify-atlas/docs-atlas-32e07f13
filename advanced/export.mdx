@@ -1,0 +1,533 @@
+---
+title: Data Export
+description: Export Dzaleka Digital Heritage data to CSV and Markdown formats for analysis and reporting
+icon: file-export
+---
+
+## Overview
+
+The export functionality allows you to extract data from the Dzaleka Digital Heritage platform into portable formats. You can generate CSV files for data analysis or Markdown reports for documentation.
+
+### Use Cases
+
+- Data analysis and visualization in spreadsheet applications
+- Generate reports for stakeholders
+- Create backups of structured data
+- Import data into other systems
+- Document platform content for archival purposes
+
+### Supported Formats
+
+- **CSV**: Structured data suitable for Excel, Google Sheets, or data analysis tools
+- **Markdown**: Human-readable reports with detailed information
+
+## CSV Export
+
+Export structured data to CSV format for analysis in spreadsheet applications.
+
+### Basic CSV Export
+
+```bash
+dzdk export csv --type services --output services.csv
+```
+
+This creates a CSV file with all services data.
+
+### Export All Content Types
+
+<Tabs>
+  <Tab title="Services">
+    ```bash
+    dzdk export csv --type services --output services.csv
+    ```
+    
+    Exports service listings with contact information, locations, and categories.
+  </Tab>
+  
+  <Tab title="Events">
+    ```bash
+    dzdk export csv --type events --output events.csv
+    ```
+    
+    Exports event data with dates, locations, and descriptions.
+  </Tab>
+  
+  <Tab title="Photos">
+    ```bash
+    dzdk export csv --type photos --output photos.csv
+    ```
+    
+    Exports photo metadata including titles, descriptions, locations, and tags.
+  </Tab>
+  
+  <Tab title="Resources">
+    ```bash
+    dzdk export csv --type resources --output resources.csv
+    ```
+    
+    Exports resource information with authors, categories, and download URLs.
+  </Tab>
+  
+  <Tab title="Population">
+    ```bash
+    dzdk export csv --type population --output population.csv
+    ```
+    
+    Exports demographic and population statistics.
+  </Tab>
+</Tabs>
+
+### CSV Structure
+
+The CSV export automatically flattens nested data structures:
+
+```python
+# dzdk.py:1938-1949
+flattened_items = []
+for item in items:
+    flat_item = {}
+    for key, value in item.items():
+        if isinstance(value, dict):
+            for subkey, subvalue in value.items():
+                flat_item[f"{key}_{subkey}"] = subvalue
+        elif isinstance(value, list):
+            flat_item[key] = ', '.join(str(v) for v in value)
+        else:
+            flat_item[key] = value
+    flattened_items.append(flat_item)
+```
+
+#### Flattening Rules
+
+<AccordionGroup>
+  <Accordion title="Nested Objects">
+    Nested objects are flattened with underscore notation:
+    
+    ```json
+    // Original
+    {
+      "contact": {
+        "email": "[email protected]",
+        "phone": "+265123456"
+      }
+    }
+    ```
+    
+    ```csv
+    // CSV columns
+    contact_email, contact_phone
+    [email protected], +265123456
+    ```
+  </Accordion>
+  
+  <Accordion title="Arrays">
+    Arrays are joined with commas:
+    
+    ```json
+    // Original
+    {
+      "tags": ["education", "youth", "workshop"]
+    }
+    ```
+    
+    ```csv
+    // CSV column
+    tags
+    education, youth, workshop
+    ```
+  </Accordion>
+  
+  <Accordion title="Simple Values">
+    Simple values are exported as-is:
+    
+    ```json
+    // Original
+    {
+      "title": "Education Center",
+      "status": "active"
+    }
+    ```
+    
+    ```csv
+    // CSV columns
+    title, status
+    Education Center, active
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Markdown Reports
+
+Generate detailed reports in Markdown format for documentation and sharing.
+
+### Basic Report Generation
+
+```bash
+dzdk export report --type services --output services-report.md
+```
+
+This creates a comprehensive Markdown report with all service details.
+
+### Report Structure
+
+Markdown reports include:
+
+1. **Header**: Report title and generation timestamp
+2. **Summary**: Overview statistics
+3. **Details**: Individual entries with all fields
+
+```python
+# dzdk.py:1990-1996
+report = f"# {type.capitalize()} Report\n\n"
+report += f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+
+# Add summary
+report += "## Summary\n\n"
+report += f"Total items: {len(items)}\n\n"
+```
+
+### Example Report Format
+
+```markdown
+# Services Report
+
+Generated on: 2024-03-15 14:30:00
+
+## Summary
+
+Total items: 25
+
+## Details
+
+### Education Support Center
+
+- **id**: svc-123
+- **category**: Education
+- **status**: active
+- **description**: Providing educational resources and tutoring
+
+#### Contact
+
+- **email**: [email protected]
+- **phone**: +265123456
+
+#### Location
+
+- **address**: Zone 3, Dzaleka Camp
+- **coordinates**: -13.7833, 33.9833
+
+---
+
+### Health Clinic
+
+...
+```
+
+## Command Reference
+
+### CSV Export Syntax
+
+```bash
+dzdk export csv --type <content_type> --output <file_path>
+```
+
+#### Required Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `--type` | choice | Content type: `services`, `events`, `photos`, `resources`, `population` |
+| `--output` | path | Output file path (e.g., `data.csv`) |
+
+### Report Export Syntax
+
+```bash
+dzdk export report --type <content_type> --output <file_path>
+```
+
+#### Required Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `--type` | choice | Content type: `services`, `events`, `photos`, `resources`, `population` |
+| `--output` | path | Output file path (e.g., `report.md`) |
+
+## Export Process
+
+### Data Fetching
+
+Both export commands fetch data from the API:
+
+```python
+# dzdk.py:1923-1930
+response = requests.get(f"{BASE_URL}/{type}", timeout=TIMEOUT)
+data = format_response(response)
+
+if data.get('status') != 'success':
+    console.print("[red]Failed to fetch data[/red]")
+    sys.exit(1)
+
+items = data.get('data', {}).get(type, [])
+```
+
+### CSV Writing
+
+CSV files are written using Python's `csv.DictWriter`:
+
+```python
+# dzdk.py:1952-1956
+with open(output, 'w', newline='') as f:
+    if flattened_items:
+        writer = csv.DictWriter(f, fieldnames=flattened_items[0].keys())
+        writer.writeheader()
+        writer.writerows(flattened_items)
+```
+
+<Note>
+Column names are automatically derived from the first item's keys. All items must have consistent structure.
+</Note>
+
+### Markdown Writing
+
+Reports iterate through items and format each field:
+
+```python
+# dzdk.py:2000-2013
+for item in items:
+    report += f"### {item.get('title', 'Untitled')}\n\n"
+    
+    for key, value in item.items():
+        if isinstance(value, dict):
+            report += f"#### {key.capitalize()}\n\n"
+            for subkey, subvalue in value.items():
+                report += f"- **{subkey}**: {subvalue}\n"
+        elif isinstance(value, list):
+            report += f"- **{key}**: {', '.join(str(v) for v in value)}\n"
+        else:
+            report += f"- **{key}**: {value}\n"
+    
+    report += "\n---\n\n"
+```
+
+## Output Examples
+
+### CSV Output
+
+```csv
+id,title,category,status,contact_email,contact_phone,location_address
+svc-1,Education Center,Education,active,[email protected],+265111,Zone 3
+svc-2,Health Clinic,Healthcare,active,[email protected],+265222,Zone 1
+svc-3,Legal Aid,Legal,active,[email protected],+265333,Zone 2
+```
+
+### Markdown Output
+
+```markdown
+# Services Report
+
+Generated on: 2024-03-15 14:30:00
+
+## Summary
+
+Total items: 3
+
+## Details
+
+### Education Center
+
+- **id**: svc-1
+- **title**: Education Center
+- **category**: Education
+- **status**: active
+
+#### Contact
+
+- **email**: [email protected]
+- **phone**: +265111
+
+---
+```
+
+## Error Handling
+
+Export operations include comprehensive error handling:
+
+<Tabs>
+  <Tab title="CSV Export">
+    ```python
+    # dzdk.py:1963-1965
+    except Exception as e:
+        console.print(create_info_panel("Export Failed", f"[danger]Error: {str(e)}[/danger]"))
+        sys.exit(1)
+    ```
+  </Tab>
+  
+  <Tab title="Report Export">
+    ```python
+    # dzdk.py:2025-2027
+    except Exception as e:
+        console.print(create_info_panel("Report Generation Failed", f"[danger]Error: {str(e)}[/danger]"))
+        sys.exit(1)
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+Export operations will fail with exit code 1 if:
+- The API request fails
+- No data is available to export
+- File write permissions are insufficient
+- The output path is invalid
+</Warning>
+
+## Best Practices
+
+### File Naming
+
+1. **Use descriptive names**: Include content type and date
+   ```bash
+   dzdk export csv --type services --output services-2024-03-15.csv
+   ```
+
+2. **Organize by directory**: Keep exports organized
+   ```bash
+   mkdir -p exports/2024
+   dzdk export csv --type events --output exports/2024/events.csv
+   ```
+
+3. **Use consistent extensions**: `.csv` for CSV, `.md` for Markdown
+   ```bash
+   dzdk export report --type resources --output reports/resources.md
+   ```
+
+### Data Processing
+
+<Tip>
+**Working with exported data:**
+- Open CSV files in Excel, Google Sheets, or LibreOffice Calc
+- Use pandas for Python-based analysis: `pd.read_csv('services.csv')`
+- Convert Markdown to PDF with pandoc: `pandoc report.md -o report.pdf`
+- Version control exports with git for historical tracking
+</Tip>
+
+### Automation
+
+Create backup scripts for regular exports:
+
+```bash
+#!/bin/bash
+# backup-dzaleka-data.sh
+
+DATE=$(date +%Y-%m-%d)
+BACKUP_DIR="backups/$DATE"
+
+mkdir -p "$BACKUP_DIR"
+
+echo "Exporting Dzaleka data..."
+dzdk export csv --type services --output "$BACKUP_DIR/services.csv"
+dzdk export csv --type events --output "$BACKUP_DIR/events.csv"
+dzdk export csv --type photos --output "$BACKUP_DIR/photos.csv"
+dzdk export csv --type resources --output "$BACKUP_DIR/resources.csv"
+dzdk export csv --type population --output "$BACKUP_DIR/population.csv"
+
+echo "Generating reports..."
+dzdk export report --type services --output "$BACKUP_DIR/services-report.md"
+
+echo "Backup complete: $BACKUP_DIR"
+```
+
+## Common Workflows
+
+<AccordionGroup>
+  <Accordion title="Monthly reporting">
+    Export all data at month-end for stakeholder reports:
+    
+    ```bash
+    mkdir -p reports/march-2024
+    dzdk export report --type services --output reports/march-2024/services.md
+    dzdk export report --type events --output reports/march-2024/events.md
+    dzdk export csv --type population --output reports/march-2024/population.csv
+    ```
+  </Accordion>
+  
+  <Accordion title="Data analysis">
+    Export to CSV for analysis in R, Python, or Excel:
+    
+    ```bash
+    dzdk export csv --type events --output events.csv
+    python analyze_events.py events.csv
+    ```
+  </Accordion>
+  
+  <Accordion title="Complete backup">
+    Create a complete snapshot of all platform data:
+    
+    ```bash
+    BACKUP_DIR="backup-$(date +%Y%m%d)"
+    mkdir -p "$BACKUP_DIR"
+    
+    for TYPE in services events photos resources population; do
+      dzdk export csv --type $TYPE --output "$BACKUP_DIR/${TYPE}.csv"
+      dzdk export report --type $TYPE --output "$BACKUP_DIR/${TYPE}-report.md"
+    done
+    
+    tar -czf "$BACKUP_DIR.tar.gz" "$BACKUP_DIR"
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Performance Considerations
+
+- **Large datasets**: Exports fetch all data at once; expect delays for large datasets
+- **Network dependency**: Requires active API connection
+- **Memory usage**: Large datasets are held in memory during export
+- **File size**: CSV files with nested data can be larger than expected
+
+<Note>
+For very large datasets (>10,000 items), consider:
+- Exporting during off-peak hours
+- Using CSV format for better performance
+- Implementing pagination if API supports it
+</Note>
+
+## Troubleshooting
+
+### Empty Exports
+
+If exports contain no data:
+
+```bash
+# Verify data exists
+dzdk services list
+
+# Check API connectivity
+dzdk health
+
+# Retry export
+dzdk export csv --type services --output services.csv
+```
+
+### Permission Errors
+
+Ensure write permissions:
+
+```bash
+# Check directory permissions
+ls -la $(dirname output-file.csv)
+
+# Use absolute paths
+dzdk export csv --type services --output /home/user/exports/services.csv
+```
+
+### Encoding Issues
+
+If special characters appear incorrectly:
+
+1. CSV files are written with UTF-8 encoding
+2. Open in applications that support UTF-8 (most modern tools)
+3. For Excel on Windows, import as UTF-8 CSV
+
+## Next Steps
+
+- Combine exports with [search functionality](/advanced/search) to filter data first
+- Use [batch operations](/advanced/batch-operations) to download referenced files
+- Explore the [interactive shell](/advanced/interactive-shell) for iterative exports

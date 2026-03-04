@@ -1,0 +1,180 @@
+---
+title: 'dzdk services'
+description: 'Manage Dzaleka services including listing and viewing service details'
+---
+
+## Overview
+
+The `dzdk services` command group allows you to manage and explore services available in Dzaleka Refugee Camp. You can list services with filtering and pagination, and view detailed information about specific services.
+
+## Commands
+
+### dzdk services list
+
+List available services with filtering, sorting, and pagination support.
+
+```bash
+dzdk services list [OPTIONS]
+```
+
+#### Options
+
+<ParamField path="--search" type="string">
+  Search term to filter services. Searches across title, description, and category fields.
+</ParamField>
+
+<ParamField path="--category" type="string">
+  Filter services by category name.
+</ParamField>
+
+<ParamField path="--status" type="string">
+  Filter by service status. Available values: `active`, `inactive`, `unknown`.
+</ParamField>
+
+<ParamField path="--sort-by" type="string" default="title">
+  Sort results by field. Available values: `title`, `category`, `status`.
+</ParamField>
+
+<ParamField path="--sort-order" type="string" default="asc">
+  Sort order for results. Available values: `asc` (ascending), `desc` (descending).
+</ParamField>
+
+<ParamField path="--page" type="integer" default="1">
+  Page number to view. Services are displayed 12 per page.
+</ParamField>
+
+#### Examples
+
+```bash
+# List all services (first page)
+dzdk services list
+
+# Search for education-related services
+dzdk services list --search education
+
+# Filter by healthcare category
+dzdk services list --category healthcare
+
+# Show only active services
+dzdk services list --status active
+
+# Sort by category in descending order
+dzdk services list --sort-by category --sort-order desc
+
+# View second page of results
+dzdk services list --page 2
+
+# Combine filters: search active healthcare services
+dzdk services list --search health --status active --category healthcare
+```
+
+#### Output Format
+
+The command displays a table with the following columns:
+- **Title**: Service name
+- **Category**: Service category
+- **Contact**: Email and phone contact information (with clickable links)
+- **Status**: Visual status indicator (● green=active, red=inactive, yellow=unknown)
+- **Website**: Clickable website link
+
+Pagination info shows current page, total pages, and navigation commands.
+
+---
+
+### dzdk services get
+
+Get detailed information for a specific service.
+
+```bash
+dzdk services get --id <service-id>
+```
+
+#### Options
+
+<ParamField path="--id" type="string" required>
+  Service ID or slug to retrieve. This is a required parameter.
+</ParamField>
+
+#### Examples
+
+```bash
+# Get service by ID
+dzdk services get --id service-123
+
+# Get service by slug
+dzdk services get --id healthcare-clinic
+```
+
+#### Output Format
+
+Displays comprehensive service information including:
+
+**Service Details**
+- Title
+- Description
+- Category
+- Status
+- Featured status
+- Verification status
+
+**Contact Information**
+- Email (clickable mailto: link)
+- Phone (clickable tel: link)
+- Operating hours
+
+**Social Media & Online Presence**
+- Website
+- Facebook
+- Twitter/X
+- Instagram
+- LinkedIn
+- WhatsApp
+- YouTube
+- TikTok
+
+**Location**
+- Address
+- City
+- GPS Coordinates (latitude/longitude)
+
+**Additional Information**
+- Last updated date
+- Languages supported
+- Tags
+
+## Pagination
+
+All list commands display 12 items per page. Use the `--page` flag to navigate:
+
+```bash
+# View page 1 (default)
+dzdk services list
+
+# View page 2
+dzdk services list --page 2
+
+# View page 5
+dzdk services list --page 5
+```
+
+The output includes navigation help showing commands for next/previous pages.
+
+## Filtering and Sorting
+
+You can combine multiple filters and sorting options:
+
+```bash
+# Complex filter: active healthcare services sorted by title
+dzdk services list --category healthcare --status active --sort-by title --sort-order asc
+
+# Search with pagination
+dzdk services list --search clinic --page 2
+```
+
+## Notes
+
+- Services marked with ✓ Featured Service are highlighted services
+- Services marked with ✓ Verified have been verified by administrators
+- Contact information includes clickable links for email, phone, and social media
+- Status indicators use colored dots for quick visual reference
+- Search is case-insensitive and searches across multiple fields

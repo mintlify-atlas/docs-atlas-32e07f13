@@ -1,0 +1,221 @@
+---
+title: 'Services Management'
+description: 'Browse and manage community services in Dzaleka'
+icon: 'briefcase'
+---
+
+## Overview
+
+The services management feature allows you to browse, search, and view detailed information about community services available in Dzaleka. Services include healthcare, education, legal aid, and other community resources.
+
+<CardGroup cols={2}>
+  <Card title="List Services" icon="list">
+    Browse all available services with filtering and pagination
+  </Card>
+  <Card title="Service Details" icon="circle-info">
+    View comprehensive information about specific services
+  </Card>
+  <Card title="Search & Filter" icon="filter">
+    Filter by category, status, or search terms
+  </Card>
+  <Card title="Contact Info" icon="address-book">
+    Access emails, phone numbers, and social media links
+  </Card>
+</CardGroup>
+
+## Listing Services
+
+### Basic Usage
+
+List all services with default settings (12 per page):
+
+```bash
+dzdk services list
+```
+
+### Filtering Options
+
+<Tabs>
+  <Tab title="Search">
+    Search across service titles, descriptions, and categories:
+    
+    ```bash
+    dzdk services list --search "healthcare"
+    dzdk services list --search "education"
+    ```
+  </Tab>
+  
+  <Tab title="Category">
+    Filter by specific category:
+    
+    ```bash
+    dzdk services list --category "health"
+    dzdk services list --category "education"
+    ```
+  </Tab>
+  
+  <Tab title="Status">
+    Filter by service status:
+    
+    ```bash
+    dzdk services list --status active
+    dzdk services list --status inactive
+    dzdk services list --status unknown
+    ```
+  </Tab>
+</Tabs>
+
+### Sorting and Pagination
+
+Sort results by different fields:
+
+```bash
+# Sort by title (default)
+dzdk services list --sort-by title --sort-order asc
+
+# Sort by category descending
+dzdk services list --sort-by category --sort-order desc
+
+# Sort by status
+dzdk services list --sort-by status
+```
+
+Navigate through pages:
+
+```bash
+# View page 2
+dzdk services list --page 2
+
+# View page 3 with filters
+dzdk services list --page 3 --category "health" --status active
+```
+
+### Output Format
+
+The list command displays services in a formatted table:
+
+```
+┌─────────────────────┬──────────────────┬────────────────────┬────────┬──────────────────┐
+│ Title               │ Category         │ Contact            │ Status │ Website          │
+├─────────────────────┼──────────────────┼────────────────────┼────────┼──────────────────┤
+│ Community Health    │ Healthcare       │ 📧 health@dzaleka  │   ●    │ health.dzaleka   │
+│ Center              │                  │ 📞 +265123456789   │        │                  │
+└─────────────────────┴──────────────────┴────────────────────┴────────┴──────────────────┘
+```
+
+<Note>
+  Status indicators: 🟢 (active), 🔴 (inactive), 🟡 (unknown)
+</Note>
+
+## Service Details
+
+### Get Specific Service
+
+Retrieve detailed information about a service using its ID or slug:
+
+```bash
+dzdk services get --id <service-id>
+dzdk services get --id community-health-center
+```
+
+### Information Displayed
+
+The service details panel includes:
+
+<AccordionGroup>
+  <Accordion title="Basic Information">
+    - Service title and description
+    - Category and status
+    - Featured and verified badges
+  </Accordion>
+  
+  <Accordion title="Contact Information">
+    - Email (clickable mailto: links)
+    - Phone numbers (clickable tel: links)
+    - Operating hours
+  </Accordion>
+  
+  <Accordion title="Social Media & Online Presence">
+    - Website
+    - Facebook
+    - Twitter/X
+    - Instagram
+    - LinkedIn
+    - WhatsApp
+    - YouTube
+    - TikTok
+  </Accordion>
+  
+  <Accordion title="Location Details">
+    - Physical address
+    - City
+    - GPS coordinates (latitude/longitude)
+  </Accordion>
+  
+  <Accordion title="Additional Information">
+    - Last updated timestamp
+    - Languages supported
+    - Service tags
+  </Accordion>
+</AccordionGroup>
+
+## Use Cases
+
+### Find Healthcare Services
+
+```bash
+# Search for healthcare services
+dzdk services list --search "health" --status active
+
+# Get details of a specific clinic
+dzdk services get --id health-clinic-01
+```
+
+### Browse Education Resources
+
+```bash
+# Filter education services
+dzdk services list --category "education" --sort-by title
+
+# View multiple pages
+dzdk services list --category "education" --page 2
+```
+
+### Find Active Services by Location
+
+```bash
+# Search for services in a specific area
+dzdk services list --search "zone" --status active
+
+# View contact details
+dzdk services get --id local-service-01
+```
+
+## Command Reference
+
+### services list
+
+**Options:**
+- `--search TEXT` - Search term to filter services
+- `--category TEXT` - Filter by category
+- `--status [active|inactive|unknown]` - Filter by status
+- `--sort-by [title|category|status]` - Sort results by field (default: title)
+- `--sort-order [asc|desc]` - Sort order (default: asc)
+- `--page INTEGER` - Page number to view (default: 1)
+
+**Pagination:**
+- 12 services per page
+- Navigation instructions displayed after results
+
+### services get
+
+**Options:**
+- `--id TEXT` - Service ID or slug (required)
+
+**Output:**
+- Formatted panel with comprehensive service information
+- Clickable links for emails, phones, and websites
+
+<Warning>
+  Service IDs are case-sensitive. Make sure to use the exact ID shown in the list command.
+</Warning>

@@ -1,0 +1,296 @@
+---
+title: dzdk stats
+description: View statistics and analytics about platform data and usage
+---
+
+Generate and view statistics, analytics, and usage patterns for platform data.
+
+## Subcommands
+
+- `dzdk stats services` - Service distribution and statistics
+- `dzdk stats usage` - Usage statistics and trends
+
+## dzdk stats services
+
+Show service distribution, category breakdown, and status statistics.
+
+### Syntax
+
+```bash
+dzdk stats services [options]
+```
+
+### Options
+
+<ParamField path="--output" type="path">
+  Save report to file
+  
+  Optional. If provided, generates a markdown report in addition to terminal display
+</ParamField>
+
+### Examples
+
+#### View Service Statistics
+
+```bash
+dzdk stats services
+```
+
+#### Generate and Save Report
+
+```bash
+dzdk stats services --output service_stats.md
+```
+
+#### Save Report to Custom Location
+
+```bash
+dzdk stats services --output ~/Reports/services_2024.md
+```
+
+### Statistics Displayed
+
+#### Overall Statistics Panel
+
+- **Total Services**: Total count of all services
+- **Status Distribution**:
+  - Active services (count and percentage)
+  - Inactive services (count and percentage)
+  - Unknown status (count and percentage)
+
+#### Category Distribution Table
+
+A detailed table showing:
+- Category name
+- Count of services in category
+- Percentage of total
+- Visual bar chart representation
+
+### Output Format
+
+**Terminal Display:**
+```
+┌─ Overall Statistics ─────────────────────┐
+│                                          │
+│ Total Services: 45                       │
+│                                          │
+│ Status Distribution:                     │
+│ Active: 38 (84.4%)                      │
+│ Inactive: 5 (11.1%)                     │
+│ Unknown: 2 (4.4%)                       │
+│                                          │
+└──────────────────────────────────────────┘
+
+┌─ Category Distribution ──────────────────┐
+│ Category     │ Count │ Percentage │ Visual│
+│ Healthcare   │   15  │   33.3%    │ ████ │
+│ Education    │   12  │   26.7%    │ ███  │
+│ Community    │    8  │   17.8%    │ ██   │
+└──────────────────────────────────────────┘
+```
+
+### Saved Report Format
+
+When `--output` is specified, generates a markdown file:
+
+```markdown
+# Service Statistics Report
+Generated on: 2024-01-15 14:30:00
+
+## Overall Statistics
+- Total Services: 45
+
+### Status Distribution
+- Active: 38 (84.4%)
+- Inactive: 5 (11.1%)
+- Unknown: 2 (4.4%)
+
+## Category Distribution
+- Healthcare: 15 (33.3%)
+- Education: 12 (26.7%)
+- Community: 8 (17.8%)
+```
+
+### Visual Bar Charts
+
+Categories are displayed with visual bars where:
+- Each `█` character represents 2% of total
+- Bars are color-coded (magenta in terminal)
+- Sorted by count (descending)
+
+## dzdk stats usage
+
+Show usage statistics and API endpoint trends.
+
+### Syntax
+
+```bash
+dzdk stats usage [options]
+```
+
+### Options
+
+<ParamField path="--days" type="integer" default="30">
+  Number of days to analyze
+  
+  Specifies the time period for usage analysis
+</ParamField>
+
+<ParamField path="--output" type="path">
+  Save report to file
+  
+  Optional. If provided, generates a markdown report
+</ParamField>
+
+### Examples
+
+#### View Last 30 Days
+
+```bash
+dzdk stats usage
+```
+
+#### Analyze Last 7 Days
+
+```bash
+dzdk stats usage --days 7
+```
+
+#### Generate 90-Day Report
+
+```bash
+dzdk stats usage --days 90 --output usage_report.md
+```
+
+### Statistics Displayed
+
+#### Overall Statistics Panel
+
+- **Total Requests**: Number of API requests
+- **Average Response Time**: Mean response time in seconds
+- **Success Rate**: Percentage of successful requests
+- **Error Distribution**:
+  - Timeout errors
+  - Not found errors (404)
+  - Server errors (5xx)
+  - Validation errors
+
+#### Popular Endpoints Table
+
+Shows the most frequently accessed endpoints:
+- Endpoint path
+- Request count
+- Percentage of total requests
+- Visual bar chart
+
+### Output Format
+
+**Terminal Display:**
+```
+┌─ Usage Overview ─────────────────────────┐
+│                                          │
+│ Overall Statistics                       │
+│ Total Requests: 1,500                   │
+│ Average Response Time: 0.80s            │
+│ Success Rate: 98.5%                     │
+│                                          │
+│ Error Distribution                       │
+│ Timeout: 15                             │
+│ Not Found: 8                            │
+│ Server Error: 5                         │
+│ Validation Error: 2                     │
+│                                          │
+└──────────────────────────────────────────┘
+
+┌─ Popular Endpoints ──────────────────────┐
+│ Endpoint    │ Requests │ Percentage │ Bar │
+│ /services   │   450    │   30.0%    │ ███ │
+│ /events     │   300    │   20.0%    │ ██  │
+│ /photos     │   250    │   16.7%    │ ██  │
+└──────────────────────────────────────────┘
+```
+
+### Saved Report Format
+
+```markdown
+# Usage Statistics Report
+Generated on: 2024-01-15 14:30:00
+Analysis Period: Last 30 days
+
+## Overall Statistics
+- Total Requests: 1,500
+- Average Response Time: 0.80s
+- Success Rate: 98.5%
+
+## Error Distribution
+- Timeout: 15
+- Not Found: 8
+- Server Error: 5
+- Validation Error: 2
+
+## Popular Endpoints
+- /services: 450 requests (30.0%)
+- /events: 300 requests (20.0%)
+- /photos: 250 requests (16.7%)
+```
+
+## Progress Indicators
+
+Both stats commands show:
+- Spinner during data fetching
+- Analysis progress bar
+- Completion messages
+
+## Data Sources
+
+### Service Statistics
+- Fetches live data from `/services` endpoint
+- Analyzes all available services
+- Calculates distributions in real-time
+
+### Usage Statistics
+- Currently uses mock data for demonstration
+- In production, would fetch from analytics API
+- Tracks endpoint access patterns
+
+## Error Handling
+
+**No Services Found:**
+```bash
+No services found
+```
+
+**API Error:**
+```bash
+Error fetching services: [error message]
+```
+
+**Analysis Error:**
+```bash
+Error analyzing usage: [error message]
+```
+
+## Use Cases
+
+### Service Statistics
+- Monitor service distribution
+- Identify category gaps
+- Track active vs. inactive services
+- Generate reports for stakeholders
+- Plan resource allocation
+
+### Usage Statistics
+- Monitor API health
+- Identify popular endpoints
+- Track error rates
+- Performance monitoring
+- Capacity planning
+
+## Notes
+
+- Statistics are calculated from live data
+- Terminal output uses colored formatting
+- Bar charts scale automatically
+- Reports are timestamped
+- Both stats commands can run without output file
+- Saved reports use markdown format for easy viewing

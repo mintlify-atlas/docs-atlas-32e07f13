@@ -1,0 +1,188 @@
+---
+title: dzdk batch
+description: Perform batch operations for downloading and uploading multiple files
+---
+
+Batch operations allow you to download or upload multiple resources and photos efficiently with progress tracking.
+
+## Subcommands
+
+- `dzdk batch download` - Download multiple resources or photos
+- `dzdk batch upload` - Upload multiple photos from a directory
+
+## dzdk batch download
+
+Download multiple resources or photos in a single operation.
+
+### Syntax
+
+```bash
+dzdk batch download --type <content_type> --ids <id_list> [options]
+```
+
+### Options
+
+<ParamField path="--type" type="choice" required>
+  Type of content to download
+  
+  **Choices:** `resources`, `photos`
+</ParamField>
+
+<ParamField path="--ids" type="string" required>
+  Comma-separated list of IDs to download
+  
+  Can be either item IDs or slugs
+</ParamField>
+
+<ParamField path="--output-dir" type="path" default="downloads">
+  Output directory for downloaded files
+  
+  Directory is created automatically if it doesn't exist
+</ParamField>
+
+### Examples
+
+#### Download Multiple Resources
+
+```bash
+dzdk batch download --type resources --ids "res-123,res-456,res-789"
+```
+
+#### Download Photos to Custom Directory
+
+```bash
+dzdk batch download --type photos --ids "photo1,photo2,photo3" --output-dir "my_photos"
+```
+
+#### Download Using Slugs
+
+```bash
+dzdk batch download --type resources --ids "education-guide,health-manual,community-handbook" --output-dir "~/Documents/guides"
+```
+
+### File Naming
+
+Downloaded files are named based on the item title:
+
+**Resources:**
+```
+[title].[fileType]
+```
+
+**Photos:**
+```
+[title].jpg
+```
+
+### Progress Display
+
+The download command shows:
+- Progress bar with percentage
+- Time remaining
+- Individual file completion messages
+- Final summary with output directory path
+
+### Error Handling
+
+- If an item is not found, a warning is displayed and the download continues
+- If a download URL is missing, the item is skipped
+- Network errors are caught and displayed without stopping other downloads
+
+## dzdk batch upload
+
+Upload multiple files from a directory.
+
+### Syntax
+
+```bash
+dzdk batch upload --directory <path> --type <content_type>
+```
+
+### Options
+
+<ParamField path="--directory" type="path" required>
+  Directory containing files to upload
+  
+  Must be an existing directory
+</ParamField>
+
+<ParamField path="--type" type="choice" required>
+  Type of content to upload
+  
+  **Choices:** `photos`
+  
+  Currently only photos are supported for batch upload
+</ParamField>
+
+### Examples
+
+#### Upload All Photos from Directory
+
+```bash
+dzdk batch upload --directory "./my_photos" --type photos
+```
+
+#### Upload from Absolute Path
+
+```bash
+dzdk batch upload --directory "/home/user/Pictures/event_photos" --type photos
+```
+
+### Supported File Types
+
+For photos:
+- `.jpg`
+- `.jpeg`
+- `.png`
+
+### File Size Limit
+
+Maximum file size: **10 MB**
+
+Files larger than 10 MB are skipped with a warning message.
+
+### File Metadata
+
+Uploaded files use:
+- **Title**: Derived from filename (stem without extension)
+- Additional metadata can be added after upload using `dzdk photos edit`
+
+### Progress Display
+
+The upload command shows:
+- Progress bar with percentage
+- Time remaining
+- Individual file upload confirmations
+- Final summary with total files processed
+
+### Error Handling
+
+**No Files Found:**
+```bash
+No suitable files found in directory
+```
+
+**File Too Large:**
+```bash
+Warning: File too large: [filename]
+```
+
+**Upload Error:**
+```bash
+Error uploading [filename]: [error message]
+```
+
+## Performance
+
+Both batch operations:
+- Process files sequentially with progress tracking
+- Use streaming for downloads to handle large files efficiently
+- Display real-time progress updates
+- Continue processing even if individual items fail
+
+## Notes
+
+- Batch operations require active network connection
+- Downloaded files overwrite existing files with the same name
+- Upload titles are automatically generated from filenames
+- Progress bars show both individual item progress and overall completion

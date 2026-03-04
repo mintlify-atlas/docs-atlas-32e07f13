@@ -1,0 +1,545 @@
+---
+title: Interactive Shell Mode
+description: Use the Dzaleka CLI in an interactive shell with command history, auto-completion, and persistent sessions
+icon: terminal
+---
+
+## Overview
+
+The interactive shell provides a dedicated environment for working with the Dzaleka Digital Heritage CLI. Instead of typing `dzdk` before every command, you can enter shell mode and execute commands directly with enhanced features like command history and auto-suggestions.
+
+### Use Cases
+
+- Exploratory data analysis with multiple commands
+- Iterative workflows without repeating `dzdk` prefix
+- Quick access to command history
+- Learning CLI commands with auto-completion
+- Long-running sessions with persistent configuration
+
+### Benefits
+
+- **Command history**: Access previously executed commands with arrow keys
+- **Auto-suggestions**: Get suggestions based on command history
+- **Tab completion**: Complete commands and options automatically
+- **Persistent sessions**: Stay connected for multiple operations
+- **Organized commands**: Commands grouped by category for easy discovery
+
+## Starting the Shell
+
+Enter interactive shell mode:
+
+```bash
+dzdk shell
+```
+
+You'll see the welcome screen:
+
+```
+╭─────────────────────────────────────────────────────────────────────────╮
+│                                                                         │
+│  Welcome to Dzaleka Digital Heritage CLI Shell                          │
+│  Type 'help' or '?' to list commands                                    │
+│                                                                         │
+╰─────────────────────────────────────────────────────────────────────────╯
+
+dzdk> 
+```
+
+## Basic Usage
+
+In shell mode, omit the `dzdk` prefix from commands:
+
+<Tabs>
+  <Tab title="Shell Mode">
+    ```bash
+    dzdk> services list
+    dzdk> events get christmas-celebration
+    dzdk> photos list --limit 20
+    dzdk> search --query "education" --type services
+    ```
+  </Tab>
+  
+  <Tab title="Standard CLI">
+    ```bash
+    dzdk services list
+    dzdk events get christmas-celebration
+    dzdk photos list --limit 20
+    dzdk search --query "education" --type services
+    ```
+  </Tab>
+</Tabs>
+
+## Shell Commands
+
+The shell includes special commands for navigation and control:
+
+### Help Command
+
+View all available commands organized by category:
+
+```bash
+dzdk> help
+```
+
+Output shows commands grouped by function:
+
+```python
+# dzdk.py:2302-2319
+self.commands = {
+    'Health': ['health'],
+    'Services': ['services list', 'services get'],
+    'Events': ['events list', 'events get'],
+    'Photos': [
+        'photos list', 'photos get', 'photos upload', 'photos metadata',
+        'photos edit', 'photos album create', 'photos album add',
+        'photos album list'
+    ],
+    'Population': ['population stats', 'population get'],
+    'Resources': ['resources list', 'resources get', 'resources fetch'],
+    'Search': ['search'],
+    'Batch': ['batch download', 'batch upload'],
+    'Export': ['export csv', 'export report'],
+    'Config': ['config'],
+    'Shell': ['help', 'clear', 'exit']
+}
+```
+
+### Get Command Help
+
+View detailed help for a specific command:
+
+```bash
+dzdk> help services
+```
+
+This displays the full help text for the `services` command group.
+
+### Clear Screen
+
+Clear the terminal and redisplay the welcome message:
+
+```bash
+dzdk> clear
+```
+
+```python
+# dzdk.py:2356-2359
+def do_clear(self, arg):
+    """Clear the terminal screen"""
+    os.system('cls' if os.name == 'nt' else 'clear')
+    console.print(self.intro)
+```
+
+### Exit Shell
+
+Exit the interactive shell:
+
+```bash
+dzdk> exit
+```
+
+Or use `Ctrl+C` for keyboard interrupt:
+
+```python
+# dzdk.py:2411-2412
+except KeyboardInterrupt:
+    console.print("\n[green]Goodbye![/green]")
+```
+
+## Command History
+
+The shell maintains persistent command history across sessions.
+
+### History File Location
+
+```python
+# dzdk.py:2292-2294
+self.history_file = Path.home() / '.dzdk' / 'history'
+self.history_file.parent.mkdir(parents=True, exist_ok=True)
+self.history_file.touch(exist_ok=True)
+```
+
+History is stored in `~/.dzdk/history`.
+
+### Using History
+
+<AccordionGroup>
+  <Accordion title="Navigate history">
+    Use arrow keys to browse command history:
+    - **Up arrow**: Previous command
+    - **Down arrow**: Next command
+  </Accordion>
+  
+  <Accordion title="Auto-suggestions">
+    As you type, the shell suggests commands from your history:
+    
+    ```python
+    # dzdk.py:2297-2300
+    self.session = PromptSession(
+        history=FileHistory(str(self.history_file)),
+        auto_suggest=AutoSuggestFromHistory()
+    )
+    ```
+    
+    Start typing and press the right arrow to accept suggestions.
+  </Accordion>
+  
+  <Accordion title="Persistent across sessions">
+    History is automatically saved when you exit:
+    
+    ```python
+    # dzdk.py:2326-2330
+    # Register exit handler
+    atexit.register(self.save_history)
+    
+    def save_history(self):
+        """Save command history to file"""
+        readline.write_history_file(str(self.history_file))
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Auto-Completion
+
+The shell provides tab completion for commands:
+
+```python
+# dzdk.py:2321-2323
+# Flatten commands for completion
+self.all_commands = [cmd for cmds in self.commands.values() for cmd in cmds]
+self.completer = WordCompleter(self.all_commands)
+```
+
+### Using Tab Completion
+
+1. Start typing a command
+2. Press **Tab** to see completions
+3. Press **Tab** again to cycle through options
+
+Example:
+
+```bash
+dzdk> serv<Tab>
+# Completes to: services
+
+dzdk> services <Tab><Tab>
+# Shows: list, get
+
+dzdk> services l<Tab>
+# Completes to: services list
+```
+
+## Command Execution
+
+Commands are executed through the Click CLI:
+
+```python
+# dzdk.py:2332-2354
+def default(self, line):
+    """Handle commands"""
+    try:
+        # Split the command into parts
+        parts = line.split()
+        if not parts:
+            return
+        
+        # Execute the command using Click
+        with console.capture() as capture:
+            try:
+                cli.main(args=parts, standalone_mode=False)
+            except SystemExit:
+                pass
+        
+        # Print the output
+        console.print(capture.get())
+        
+    except Exception as e:
+        console.print(Panel(
+            f"[red]Error executing command: {str(e)}[/red]",
+            border_style="red"
+        ))
+```
+
+Commands are parsed, executed, and output is captured and displayed.
+
+## Shell Implementation
+
+The shell is built using Python's `cmd` module:
+
+```python
+# dzdk.py:2277-2289
+class DzdkShell(cmd.Cmd):
+    """Interactive shell for Dzaleka Digital Heritage CLI"""
+    
+    intro = """
+╭─────────────────────────────────────────────────────────────────────────╮
+│                                                                         │
+│  [bold cyan]Welcome to Dzaleka Digital Heritage CLI Shell[/bold cyan]    │
+│  [dim]Type 'help' or '?' to list commands[/dim]                        │
+│                                                                         │
+╰─────────────────────────────────────────────────────────────────────────╯
+    """
+    prompt = 'dzdk> '
+```
+
+### Features
+
+- **Custom prompt**: `dzdk>` prompt for clear identification
+- **Intro message**: Styled welcome screen using Rich
+- **Command delegation**: All commands forwarded to main CLI
+- **Error handling**: Graceful error display without crashes
+
+## Interactive Workflows
+
+### Exploratory Analysis
+
+Use the shell for multi-step exploration:
+
+```bash
+dzdk> health
+dzdk> services list
+dzdk> services get education-center
+dzdk> photos list --category education
+dzdk> search --query "education" --type all
+dzdk> export csv --type services --output services.csv
+```
+
+### Iterative Development
+
+Test commands repeatedly while developing scripts:
+
+```bash
+dzdk> photos list --limit 5
+dzdk> photos get photo-123
+dzdk> photos metadata photo-123
+dzdk> photos edit photo-123 --title "New Title"
+dzdk> photos get photo-123
+```
+
+### Batch Processing
+
+Plan and execute batch operations:
+
+```bash
+dzdk> resources list
+# Review resource IDs
+dzdk> batch download --type resources --ids "id1,id2,id3" --output-dir downloads
+dzdk> export csv --type resources --output resources.csv
+```
+
+## Best Practices
+
+### Session Management
+
+<Tip>
+**Optimize your shell sessions:**
+- Start shell mode for multi-command workflows
+- Use standard CLI mode for single commands
+- Clear screen periodically to reduce clutter
+- Exit cleanly to save command history
+</Tip>
+
+### Command Organization
+
+1. **Group related commands**: Execute similar operations together
+   ```bash
+   dzdk> services list
+   dzdk> services get service-1
+   dzdk> services get service-2
+   ```
+
+2. **Use help frequently**: Reference help when exploring new commands
+   ```bash
+   dzdk> help photos
+   dzdk> photos list
+   ```
+
+3. **Leverage history**: Reuse and modify previous commands
+   - Press up arrow to recall
+   - Edit and re-execute
+   - Build on previous commands
+
+### Error Recovery
+
+If a command fails:
+
+```bash
+dzdk> services get invalid-id
+# Error displayed
+
+dzdk> services list
+# Continue with valid commands
+```
+
+The shell remains active after errors, allowing you to continue working.
+
+## Advanced Usage
+
+### Command Aliases
+
+While the shell doesn't support built-in aliases, you can use shell history:
+
+1. Execute a complex command
+2. Use up arrow to recall it
+3. Press Enter to re-execute
+
+Example workflow:
+
+```bash
+dzdk> search --query "education" --type services --limit 20
+# ... results ...
+
+# Later in session, press up arrow to find and re-execute
+dzdk> search --query "education" --type services --limit 20
+```
+
+### Combining with Shell Features
+
+The interactive shell can be combined with terminal features:
+
+<Tabs>
+  <Tab title="Screen/Tmux">
+    Run the shell in a terminal multiplexer:
+    
+    ```bash
+    screen -S dzdk
+    dzdk shell
+    # Detach: Ctrl+A, D
+    # Reattach: screen -r dzdk
+    ```
+  </Tab>
+  
+  <Tab title="Output Redirection">
+    Redirect shell session output:
+    
+    ```bash
+    dzdk shell | tee session-log.txt
+    ```
+    
+    Note: Interactive features may be limited with redirection.
+  </Tab>
+  
+  <Tab title="Script Input">
+    Feed commands from a file:
+    
+    ```bash
+    cat commands.txt | dzdk shell
+    ```
+    
+    Where `commands.txt` contains:
+    ```
+    health
+    services list
+    events list
+    exit
+    ```
+  </Tab>
+</Tabs>
+
+## Troubleshooting
+
+### Shell Won't Start
+
+If shell fails to start:
+
+```bash
+# Check Python dependencies
+pip install prompt_toolkit
+
+# Verify history directory
+mkdir -p ~/.dzdk
+touch ~/.dzdk/history
+
+# Try again
+dzdk shell
+```
+
+### Auto-Completion Not Working
+
+Ensure `prompt_toolkit` is installed:
+
+```bash
+pip install --upgrade prompt_toolkit
+```
+
+### History Not Saving
+
+Check file permissions:
+
+```bash
+ls -la ~/.dzdk/history
+chmod 644 ~/.dzdk/history
+```
+
+### Commands Not Executing
+
+Verify command syntax matches standard CLI:
+
+```bash
+# Wrong: includes 'dzdk' prefix
+dzdk> dzdk services list
+
+# Correct: omit 'dzdk' prefix
+dzdk> services list
+```
+
+## Comparison: Shell vs Standard CLI
+
+| Feature | Standard CLI | Interactive Shell |
+|---------|--------------|-------------------|
+| Command prefix | Required (`dzdk`) | Not required |
+| Command history | Terminal history | Persistent `.dzdk/history` |
+| Auto-completion | Depends on shell | Built-in with Tab |
+| Auto-suggestions | No | Yes (from history) |
+| Multi-command workflow | Manual `dzdk` each time | Seamless execution |
+| Output formatting | Same | Same |
+| Error handling | Same | Same + stays active |
+| Session persistence | No | Yes |
+
+## Performance Considerations
+
+- **Startup time**: Shell has minimal startup overhead
+- **Command execution**: Same performance as standard CLI
+- **Memory usage**: Slightly higher due to history and completion
+- **History size**: Unlimited history may grow large over time
+
+<Note>
+For automated scripts, use standard CLI mode. For interactive exploration and development, use shell mode.
+</Note>
+
+## Exit and Cleanup
+
+The shell performs cleanup on exit:
+
+```python
+# dzdk.py:2361-2367
+def do_exit(self, arg):
+    """Exit the shell"""
+    console.print(Panel(
+        "[green]Thank you for using Dzaleka Digital Heritage CLI![/green]",
+        border_style="green"
+    ))
+    return True
+```
+
+```python
+# dzdk.py:2406-2414
+@cli.command()
+def shell():
+    """Start interactive shell mode"""
+    try:
+        DzdkShell().cmdloop()
+    except KeyboardInterrupt:
+        console.print("\n[green]Goodbye![/green]")
+    except Exception as e:
+        console.print(f"[red]Error starting shell: {str(e)}[/red]")
+```
+
+History is automatically saved via the `atexit` handler.
+
+## Next Steps
+
+- Practice using [search commands](/advanced/search) in shell mode
+- Execute [batch operations](/advanced/batch-operations) interatively
+- Generate [exports](/advanced/export) from shell sessions
+- Combine shell mode with other [CLI features](/quickstart)

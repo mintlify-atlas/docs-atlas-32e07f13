@@ -1,0 +1,213 @@
+---
+title: 'dzdk resources'
+description: 'Manage digital resources including documents, files, and downloads'
+---
+
+## Overview
+
+The `dzdk resources` command group allows you to discover, view, and download digital resources from the Dzaleka archive. Resources include documents, educational materials, reports, and other digital files.
+
+## Commands
+
+### dzdk resources list
+
+List available resources with pagination support.
+
+```bash
+dzdk resources list [OPTIONS]
+```
+
+#### Options
+
+<ParamField path="--page" type="integer" default="1">
+  Page number to view. Resources are displayed 12 per page.
+</ParamField>
+
+#### Examples
+
+```bash
+# List all resources (first page)
+dzdk resources list
+
+# View second page of resources
+dzdk resources list --page 2
+
+# View fifth page
+dzdk resources list --page 5
+```
+
+#### Output Format
+
+The command displays a table with the following columns:
+- **Title**: Resource title (clickable link to resource URL if available)
+- **Category**: Resource category
+- **Author**: Resource author name
+- **Date**: Publication date (YYYY-MM-DD format)
+- **File Type**: File format (e.g., PDF, DOCX, etc.)
+
+Pagination info shows current page, total pages, and navigation commands.
+
+---
+
+### dzdk resources get
+
+Get detailed information for a specific resource.
+
+```bash
+dzdk resources get --id <resource-id>
+```
+
+#### Options
+
+<ParamField path="--id" type="string" required>
+  Resource ID or slug to retrieve. This is a required parameter.
+</ParamField>
+
+#### Examples
+
+```bash
+# Get resource by ID
+dzdk resources get --id resource-789
+
+# Get resource by slug
+dzdk resources get --id community-report-2026
+```
+
+#### Output Format
+
+Displays comprehensive resource information including:
+
+**Resource Details**
+- Title
+- Description
+- Category
+- Author
+- Publication date (YYYY-MM-DD format)
+- Last updated date (YYYY-MM-DD format)
+- File type/format
+- File size
+- Languages available
+
+**Download Information**
+- Download URL
+- Resource URL (web viewing link)
+
+---
+
+### dzdk resources fetch
+
+Download a resource file to your local system.
+
+```bash
+dzdk resources fetch --id <resource-id> --output <filename>
+```
+
+#### Options
+
+<ParamField path="--id" type="string" required>
+  Resource ID or slug to download. This is a required parameter.
+</ParamField>
+
+<ParamField path="--output" type="string" required>
+  Output filename for the downloaded resource. This is a required parameter.
+</ParamField>
+
+#### Examples
+
+```bash
+# Download a resource to a specific file
+dzdk resources fetch --id resource-789 --output report.pdf
+
+# Download with full path
+dzdk resources fetch --id community-guide --output /path/to/downloads/guide.pdf
+
+# Download with custom naming
+dzdk resources fetch --id resource-123 --output "Community Report 2026.pdf"
+```
+
+#### Download Process
+
+1. Fetches resource details to get download URL
+2. Displays progress during download
+3. Saves file to specified output path
+4. Shows confirmation message with file location
+
+#### Output
+
+Displays:
+- Download progress with spinner
+- Success confirmation
+- Output file path
+
+---
+
+## Pagination
+
+Resource list commands display 12 items per page. Use the `--page` flag to navigate:
+
+```bash
+# View page 1 (default)
+dzdk resources list
+
+# View page 2
+dzdk resources list --page 2
+
+# View page 10
+dzdk resources list --page 10
+```
+
+The output includes navigation help showing commands for next/previous pages and shows which items are currently displayed (e.g., "Showing resources 13-24 of 156").
+
+## Resource Categories
+
+Resources can include various categories such as:
+- Reports and documentation
+- Educational materials
+- Research papers
+- Community guides
+- Policy documents
+- Training materials
+
+## File Types
+
+The system supports various file formats including:
+- PDF documents
+- Word documents (DOCX, DOC)
+- Excel spreadsheets (XLSX, XLS)
+- PowerPoint presentations (PPTX, PPT)
+- Text files
+- Images
+- And more
+
+## Use Cases
+
+### Browse Available Resources
+```bash
+# View all available resources
+dzdk resources list
+
+# Navigate through pages
+dzdk resources list --page 2
+```
+
+### View Resource Details
+```bash
+# Get detailed information before downloading
+dzdk resources get --id resource-789
+```
+
+### Download Resources
+```bash
+# Download a specific resource
+dzdk resources fetch --id resource-789 --output report.pdf
+```
+
+## Notes
+
+- Resource titles in the list view are clickable links when viewed in supported terminals
+- File size and format information helps plan downloads
+- Multiple languages may be available for some resources
+- Download URLs are validated before fetching
+- Progress indicators show download status
+- Resources include metadata like author and publication date
+- Last updated date shows when the resource was most recently modified

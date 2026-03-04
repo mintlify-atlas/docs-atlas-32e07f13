@@ -1,0 +1,374 @@
+---
+title: 'Resource Library'
+description: 'Access and download digital resources and documents'
+icon: 'book'
+---
+
+## Overview
+
+The resource library provides access to digital documents, educational materials, reports, and other resources related to the Dzaleka community. Browse, search, and download resources for offline use.
+
+<CardGroup cols={2}>
+  <Card title="Browse Resources" icon="books">
+    View all available resources with pagination
+  </Card>
+  <Card title="Resource Details" icon="circle-info">
+    Access detailed information about specific resources
+  </Card>
+  <Card title="Download Files" icon="download">
+    Download resources for offline access
+  </Card>
+  <Card title="Search Library" icon="magnifying-glass">
+    Find resources by title, author, or category
+  </Card>
+</CardGroup>
+
+## Browsing Resources
+
+### List All Resources
+
+View available resources with pagination (12 per page):
+
+```bash
+dzdk resources list
+```
+
+### Navigate Pages
+
+Browse through multiple pages:
+
+```bash
+# View specific page
+dzdk resources list --page 2
+dzdk resources list --page 3
+
+# First page (default)
+dzdk resources list --page 1
+```
+
+### Output Format
+
+Resources are displayed in a formatted table:
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│              Available Resources (Page 1 of 5)                          │
+├──────────────────────┬─────────────┬──────────────┬────────────┬────────┤
+│ Title                │ Category    │ Author       │ Date       │ Type   │
+├──────────────────────┼─────────────┼──────────────┼────────────┼────────┤
+│ Education Report     │ Education   │ John Smith   │ 2026-01-15 │ PDF    │
+│ Health Guidelines    │ Health      │ Dr. Jane Doe │ 2026-02-20 │ PDF    │
+│ Community Handbook   │ Community   │ Admin Team   │ 2025-12-10 │ DOCX   │
+└──────────────────────┴─────────────┴──────────────┴────────────┴────────┘
+
+Navigation Commands:
+• To view next page: dzdk resources list --page 2
+• To view previous page: dzdk resources list --page 1
+• To view specific page: dzdk resources list --page <number>
+
+Showing resources 1-12 of 58
+```
+
+<Note>
+  Resource titles are clickable links (if your terminal supports it) that open the resource URL directly.
+</Note>
+
+## Resource Details
+
+### Get Specific Resource
+
+View comprehensive information about a resource:
+
+```bash
+dzdk resources get --id <resource-id>
+dzdk resources get --id education-report-2026
+```
+
+### Information Displayed
+
+<AccordionGroup>
+  <Accordion title="Basic Information">
+    - Resource title
+    - Description
+    - Category
+    - Author name
+    - Publication date
+    - Last updated date
+  </Accordion>
+  
+  <Accordion title="File Information">
+    - File type (PDF, DOCX, XLSX, etc.)
+    - File size (in MB or KB)
+    - Supported languages
+  </Accordion>
+  
+  <Accordion title="Download Information">
+    - Direct download URL
+    - Resource URL (for viewing online)
+  </Accordion>
+</AccordionGroup>
+
+### Example Output
+
+```
+╭────────────── Resource: Education Report 2026 ──────────────╮
+│ Resource Details                                            │
+│ Title: Education Report 2026                                │
+│ Description: Annual education statistics and analysis       │
+│ Category: Education                                         │
+│ Author: John Smith                                          │
+│ Date: 2026-01-15                                           │
+│ Last Updated: 2026-01-20                                    │
+│ File Type: PDF                                              │
+│ File Size: 2.5 MB                                           │
+│ Languages: English, French                                  │
+│                                                             │
+│ Download Information                                        │
+│ Download URL: https://dzaleka.org/downloads/report.pdf     │
+│ Resource URL: https://dzaleka.org/resources/edu-2026       │
+╰─────────────────────────────────────────────────────────────╯
+```
+
+## Downloading Resources
+
+### Download Command
+
+Download a resource file to your local system:
+
+```bash
+dzdk resources fetch --id <resource-id> --output <filename>
+```
+
+### Download Examples
+
+```bash
+# Download with custom filename
+dzdk resources fetch --id report-2026 --output education-report.pdf
+
+# Download to specific path
+dzdk resources fetch --id handbook --output ~/Documents/handbook.pdf
+
+# Download with original filename suggestion
+dzdk resources fetch --id guidelines --output guidelines.docx
+```
+
+### Download Process
+
+The download process includes:
+
+1. **Fetch Resource Details** - Retrieves resource metadata and download URL
+2. **Progress Indicator** - Shows download progress with spinner
+3. **File Save** - Saves the file to specified output location
+4. **Confirmation** - Displays success message with file path
+
+### Download Output
+
+```
+╭──────────── Fetch Resource ────────────╮
+│ Downloading resource report-2026       │
+╰────────────────────────────────────────╯
+
+⠋ Downloading...
+
+✓ Resource successfully saved to education-report.pdf
+```
+
+<Tip>
+  The file extension in the output filename should match the resource file type for proper file handling.
+</Tip>
+
+## Resource Categories
+
+Resources are organized into various categories:
+
+<CardGroup cols={2}>
+  <Card title="Education" icon="graduation-cap">
+    Educational materials, reports, and learning resources
+  </Card>
+  <Card title="Health" icon="heart-pulse">
+    Health guidelines, medical information, and wellness resources
+  </Card>
+  <Card title="Community" icon="users">
+    Community handbooks, guidelines, and organizational documents
+  </Card>
+  <Card title="Legal" icon="scale-balanced">
+    Legal documents, rights information, and policy guidelines
+  </Card>
+</CardGroup>
+
+## Use Cases
+
+### Find Educational Resources
+
+```bash
+# Browse resources (look for education category)
+dzdk resources list
+
+# Get details about specific resource
+dzdk resources get --id education-report-2026
+
+# Download the resource
+dzdk resources fetch --id education-report-2026 --output report.pdf
+```
+
+### Download Multiple Resources
+
+```bash
+# Download first resource
+dzdk resources fetch --id handbook --output handbook.pdf
+
+# Download second resource
+dzdk resources fetch --id guidelines --output guidelines.pdf
+
+# Download third resource
+dzdk resources fetch --id report --output report.pdf
+```
+
+### Browse by File Type
+
+```bash
+# List all resources
+dzdk resources list
+
+# Look for specific file types in the table
+# (Filter by File Type column visually)
+```
+
+### Check Resource Updates
+
+```bash
+# View resource details to see last updated date
+dzdk resources get --id community-handbook
+
+# Compare with previously downloaded version
+# Download if newer version is available
+dzdk resources fetch --id community-handbook --output handbook-new.pdf
+```
+
+## File Type Support
+
+The resource library supports various file formats:
+
+<Tabs>
+  <Tab title="Documents">
+    - **PDF** - Portable Document Format
+    - **DOCX** - Microsoft Word documents
+    - **ODT** - OpenDocument Text
+    - **TXT** - Plain text files
+  </Tab>
+  
+  <Tab title="Spreadsheets">
+    - **XLSX** - Microsoft Excel spreadsheets
+    - **CSV** - Comma-separated values
+    - **ODS** - OpenDocument Spreadsheet
+  </Tab>
+  
+  <Tab title="Presentations">
+    - **PPTX** - Microsoft PowerPoint
+    - **ODP** - OpenDocument Presentation
+  </Tab>
+  
+  <Tab title="Other">
+    - **ZIP** - Compressed archives
+    - **PNG/JPG** - Image files
+    - **MP4** - Video files (when available)
+  </Tab>
+</Tabs>
+
+## Command Reference
+
+### resources list
+
+**Options:**
+- `--page INTEGER` - Page number to view (default: 1)
+
+**Features:**
+- 12 resources per page
+- Automatic pagination
+- Navigation instructions included
+- Clickable titles (terminal-dependent)
+- Date formatting (YYYY-MM-DD)
+
+**Output Columns:**
+- Title (clickable link to resource URL)
+- Category
+- Author
+- Date (publication date)
+- File Type
+
+### resources get
+
+**Options:**
+- `--id TEXT` - Resource ID or slug (required)
+
+**Output:**
+- Complete resource information panel
+- Formatted dates
+- File details
+- Download URLs
+- Language information
+
+### resources fetch
+
+**Options:**
+- `--id TEXT` - Resource ID or slug (required)
+- `--output TEXT` - Output filename/path (required)
+
+**Process:**
+1. Fetches resource metadata
+2. Retrieves download URL
+3. Shows progress indicator
+4. Downloads file in chunks (8KB chunks)
+5. Saves to specified output path
+6. Displays confirmation message
+
+**Error Handling:**
+- Validates resource exists
+- Checks for download URL availability
+- Reports network errors
+- Shows descriptive error messages
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Organizing Downloads">
+    Create a dedicated folder for downloaded resources:
+    ```bash
+    mkdir ~/dzaleka-resources
+    dzdk resources fetch --id report --output ~/dzaleka-resources/report.pdf
+    ```
+  </Accordion>
+  
+  <Accordion title="Naming Conventions">
+    Use descriptive filenames that include dates or versions:
+    ```bash
+    dzdk resources fetch --id handbook --output handbook-2026-v2.pdf
+    ```
+  </Accordion>
+  
+  <Accordion title="Checking Updates">
+    Before downloading, check the "Last Updated" date to see if you need a new version:
+    ```bash
+    dzdk resources get --id handbook
+    # Check last updated date
+    # Download only if newer than your current version
+    ```
+  </Accordion>
+  
+  <Accordion title="Bulk Downloads">
+    To download multiple resources, create a simple script:
+    ```bash
+    dzdk resources fetch --id doc1 --output file1.pdf
+    dzdk resources fetch --id doc2 --output file2.pdf
+    dzdk resources fetch --id doc3 --output file3.pdf
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+  Resource availability depends on the remote server. If a download fails, verify your internet connection and that the resource still exists using the `resources get` command.
+</Warning>
+
+<Info>
+  Downloaded resources are saved to your local filesystem and can be accessed offline once downloaded.
+</Info>

@@ -1,0 +1,236 @@
+---
+title: Installation
+description: Step-by-step guide to installing the Dzaleka Digital Heritage CLI
+---
+
+## Prerequisites
+
+Before installing DZDK CLI, ensure you have the following:
+
+- Python 3.8 or higher
+- pip (Python package installer)
+- Git (for cloning the repository)
+
+<Info>
+To check your Python version, run `python --version` or `python3 --version` in your terminal.
+</Info>
+
+## Installation methods
+
+<Steps>
+  <Step title="Clone the repository">
+    Clone the DZDK CLI repository to your local machine:
+    
+    ```bash
+    git clone https://github.com/Dzaleka-Connect/dzdk-cli.git
+    cd dzdk-cli
+    ```
+  </Step>
+
+  <Step title="Create a virtual environment">
+    Create and activate a Python virtual environment to isolate the CLI dependencies:
+    
+    <CodeGroup>
+    ```bash Linux/macOS
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+    
+    ```bash Windows
+    python -m venv venv
+    venv\Scripts\activate
+    ```
+    </CodeGroup>
+    
+    <Tip>
+    You should see `(venv)` appear in your terminal prompt when the virtual environment is active.
+    </Tip>
+  </Step>
+
+  <Step title="Install dependencies">
+    Install all required Python packages:
+    
+    ```bash
+    pip install -r requirements.txt
+    ```
+    
+    This will install the following dependencies:
+    - `click>=8.0.0` - Command-line interface framework
+    - `requests>=2.26.0` - HTTP library for API requests
+    - `rich>=10.0.0` - Beautiful terminal output formatting
+    - `pyyaml>=6.0` - YAML configuration file support
+    - `pandas>=2.0.0` - Data manipulation and analysis
+    - `tabulate>=0.9.0` - Table formatting
+    - `prompt-toolkit>=3.0.0` - Interactive shell features
+    - `python-dateutil>=2.8.2` - Date parsing utilities
+  </Step>
+
+  <Step title="Install the CLI">
+    Install the CLI in editable mode so you can use the `dzdk` command:
+    
+    ```bash
+    pip install -e .
+    ```
+    
+    <Note>
+    The `-e` flag installs the package in "editable" mode, which means changes to the source code will be reflected immediately without reinstalling.
+    </Note>
+  </Step>
+
+  <Step title="Verify installation">
+    Confirm the installation was successful:
+    
+    ```bash
+    dzdk --help
+    ```
+    
+    You should see the DZDK CLI welcome message and help text.
+  </Step>
+</Steps>
+
+## Alternative installation using pip
+
+If the package is published to PyPI, you can install it directly:
+
+```bash
+pip install dzdk
+```
+
+<Warning>
+This method is only available if the package has been published to the Python Package Index (PyPI).
+</Warning>
+
+## Configuration directory
+
+After installation, DZDK will automatically create a configuration directory on first run:
+
+- **Linux/macOS**: `~/.config/dzdk/`
+- **Windows**: `%USERPROFILE%\.config\dzdk\`
+
+The configuration file `config.yaml` will be created in this directory with default settings:
+
+```yaml
+api_url: https://services.dzaleka.com/api
+timeout: 30
+```
+
+## Verify your installation
+
+Run the health check command to verify DZDK can connect to the API:
+
+```bash
+dzdk health
+```
+
+This will check all API endpoints and display their status:
+
+```
+╭─────────────────────────────────────────╮
+│  API Health Check                       │
+│  Monitoring all endpoints               │
+╰─────────────────────────────────────────╯
+
+┌────────────┬────────┬───────────────┬─────────┐
+│ Endpoint   │ Status │ Response Time │ Details │
+├────────────┼────────┼───────────────┼─────────┤
+│ services   │   ✓    │ 0.23s         │ OK      │
+│ events     │   ✓    │ 0.18s         │ OK      │
+│ photos     │   ✓    │ 0.21s         │ OK      │
+│ population │   ✓    │ 0.19s         │ OK      │
+│ resources  │   ✓    │ 0.24s         │ OK      │
+└────────────┴────────┴───────────────┴─────────┘
+
+✓ All endpoints are healthy
+```
+
+## Troubleshooting
+
+### Python version issues
+
+If you encounter Python version errors:
+
+```bash
+# Check your Python version
+python3 --version
+
+# Ensure it's 3.8 or higher
+# If not, install a newer version from python.org
+```
+
+### Virtual environment activation issues
+
+**On Windows with PowerShell:**
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+venv\Scripts\Activate.ps1
+```
+
+### Module not found errors
+
+If you get import errors, ensure all dependencies are installed:
+
+```bash
+pip install --upgrade -r requirements.txt
+```
+
+### Permission errors
+
+**On Linux/macOS:**
+```bash
+# If you get permission errors, try:
+pip install --user -r requirements.txt
+pip install --user -e .
+```
+
+### API connection issues
+
+If the health check fails:
+
+1. Verify your internet connection
+2. Check if the API URL is correct in your configuration
+3. Try updating the configuration:
+
+```bash
+dzdk config --url "https://services.dzaleka.com/api"
+```
+
+## Updating DZDK
+
+To update to the latest version:
+
+```bash
+# Navigate to the DZDK directory
+cd dzdk-cli
+
+# Pull the latest changes
+git pull origin main
+
+# Reinstall dependencies if needed
+pip install -r requirements.txt
+
+# The -e installation automatically picks up changes
+```
+
+## Uninstalling
+
+To completely remove DZDK:
+
+```bash
+# Uninstall the package
+pip uninstall dzdk
+
+# Remove the configuration directory
+rm -rf ~/.config/dzdk  # Linux/macOS
+rmdir /s %USERPROFILE%\.config\dzdk  # Windows
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quick start" icon="rocket" href="/quickstart">
+    Get started with basic commands and workflows
+  </Card>
+  <Card title="Configuration" icon="gear" href="/configuration">
+    Learn how to customize DZDK settings
+  </Card>
+</CardGroup>
