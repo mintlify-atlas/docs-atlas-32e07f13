@@ -129,6 +129,61 @@ Enter timeout in seconds [30]: 60
 └──────────────────────────────────────────────────────────────┘
 ```
 
+## View Configuration
+
+Display your current CLI configuration settings:
+
+```bash
+dzdk show-config
+```
+
+**Also available as:**
+```bash
+dzdk show_config
+```
+
+**Output:**
+```
+┌──────────────────────────────────────────────────────────────┐
+│                Current Configuration                         │
+│                Your CLI settings                             │
+└──────────────────────────────────────────────────────────────┘
+
+┌─ Configuration Details ──────────────────────────────────────┐
+│   API Settings                                               │
+│   URL: https://services.dzaleka.com/api                      │
+│   Timeout: 30 seconds                                        │
+│                                                              │
+│   Configuration File                                         │
+│   Location: /home/user/.config/dzdk/config.yaml             │
+│   Last Modified: 2024-03-04 10:30:45                         │
+└──────────────────────────────────────────────────────────────┘
+
+┌─ How to Update ──────────────────────────────────────────────┐
+│   To update your configuration, you can:                     │
+│                                                              │
+│   1. Use the config command:                                 │
+│      dzdk config --url "https://services.dzaleka.com/api" --timeout 30
+│                                                              │
+│   2. Use interactive mode:                                   │
+│      dzdk config --interactive                               │
+│                                                              │
+│   3. Edit the config file directly:                          │
+│      /home/user/.config/dzdk/config.yaml                     │
+└──────────────────────────────────────────────────────────────┘
+```
+
+The command displays:
+- Current API URL
+- Request timeout setting
+- Configuration file location
+- Last modified timestamp
+- Instructions for updating configuration
+
+<Note>
+Both `dzdk show-config` (with hyphen) and `dzdk show_config` (with underscore) work identically.
+</Note>
+
 ## URL Formatting
 
 The CLI automatically normalizes URLs:
@@ -144,5 +199,4 @@ The CLI automatically normalizes URLs:
 
 ## Related Commands
 
-- `dzdk show-config` - Display current configuration settings (documented on this page)
 - [dzdk health](/commands/health) - Check API health using configured settings
